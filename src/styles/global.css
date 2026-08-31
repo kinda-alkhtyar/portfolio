@@ -1,0 +1,976 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0C0713;
+  --color-surface: #171020;
+  --color-purple-dark: #24142F;
+  --color-purple: #7F4BA5;
+  --color-purple-light: #C08FE0;
+  --color-beige: #E6D8A8;
+  --color-white: #EFEDF0;
+  --color-muted: #A59BAA;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --font-display: "Anton", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-nav: "Oswald", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "EB Garamond", Georgia, "Times New Roman", serif;
+  --font-script: "Allura", "Segoe Script", cursive;
+  /* The closing CTA is the one place the reference leaves the condensed
+     display face for a wide geometric grotesque. */
+  --font-grotesk: "Montserrat", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+}
+
+/* Arabic uses the same canvases and artwork, with only the interface and text
+   flow switched. Tahoma is available on the target desktop platforms and has
+   complete, well-hinted Arabic coverage; no font package is required. */
+@layer base {
+  html[dir='rtl'] body {
+    font-family: Tahoma, Arial, sans-serif;
+    text-align: right;
+  }
+
+  html[dir='rtl'] .font-display,
+  html[dir='rtl'] .font-nav,
+  html[dir='rtl'] .font-serif,
+  html[dir='rtl'] .font-grotesk {
+    font-family: Tahoma, Arial, sans-serif;
+    letter-spacing: 0;
+  }
+
+  html[dir='rtl'] input,
+  html[dir='rtl'] textarea {
+    direction: rtl;
+    text-align: right;
+  }
+
+  html[dir='rtl'] input[type='email'],
+  html[dir='rtl'] input[type='tel'],
+  html[dir='rtl'] a[href^='mailto:'],
+  html[dir='rtl'] a[href^='tel:'] {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: right;
+  }
+}
+
+@layer components {
+  html[dir='rtl'] [data-motion='field'] input,
+  html[dir='rtl'] [data-motion='field'] textarea {
+    padding-left: 18px;
+    padding-right: 52px;
+  }
+
+  html[dir='rtl'] [data-motion='field'] > span {
+    left: auto;
+    right: 18px;
+  }
+
+  /* Images, films, logos and decorative compositions keep their authored
+     orientation even while their surrounding interface reads RTL. */
+  html[dir='rtl'] img,
+  html[dir='rtl'] video,
+  html[dir='rtl'] [data-motion$='scene'],
+  html[dir='rtl'] [data-motion='tulip'],
+  html[dir='rtl'] [data-motion='ring'],
+  html[dir='rtl'] [data-motion='guide'] {
+    direction: ltr;
+  }
+}
+
+/* The Arabic Home hero mirror lives in the utilities layer, not in
+   components: every offset below overrides a Tailwind arbitrary utility
+   written on the same element, and layer order — not specificity — is what
+   decides that. */
+@layer utilities {
+  /* ── Arabic Home hero ──────────────────────────────────────────────
+     The fold is *mirrored*, not translated as one block. Every decorative
+     layer keeps the offset it holds from the right of the 1440 track in
+     English and takes it from the left instead, so the ring, bloom, guide,
+     marks, quote and scroll hint land on the physical left in exactly the
+     reference composition. The copy column then moves to the physical
+     right, on the same gutter the English column holds on the left.
+
+     Physical `left` rather than the logical insets: the artwork layers are
+     deliberately `direction: ltr` below so their contents keep their
+     authored orientation, which would resolve a logical inset the wrong
+     way round. Insets are also free of GSAP, which owns `transform` on
+     every one of these elements. */
+  /* The whole mirrored group — ring, guide, bloom, marks and the quote —
+     rides one offset so its internal spacing is fixed by construction. */
+  html[dir='rtl'] .home-page {
+    --ar-group-x: 36px;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-scene [data-motion='ring'] {
+    right: auto;
+    left: calc(13px - var(--ar-group-x));
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-scene [data-motion='guide'] {
+    right: auto;
+    left: calc(224px - var(--ar-group-x));
+  }
+
+  /* The bloom and the opening's plate share one box by construction; they
+     have to share this too, or the opening would resolve on the wrong side. */
+  html[dir='rtl'] .home-page .ar-hero-scene [data-motion='tulip'],
+  html[dir='rtl'] .home-page .ar-hero-scene [data-motion='intro-plate'] {
+    right: auto;
+    left: calc(62px + var(--tulip-shift) - var(--ar-group-x));
+ 
+    /* The veil is the fold's own backdrop re-expressed in this box. Mirrored,
+       the box no longer sits under the page gradient's right shoulder, so the
+       English 30% centre painted a ground ~10 luma under the page and `lighten`
+       kept it — that is the black plate. The page gradient's centre is at
+       66% x 1440 = 950px; the box now starts at 26px + --tulip-shift, so the
+       same point is that far into it. Radii (165% / 80%) and the stops are
+       unchanged, so nothing about the mask, the blend or the clip moves. */
+    --tulip-veil: radial-gradient(
+      165% 80% at calc(924px - var(--tulip-shift)) 27%,
+      #26123a 0%,
+      #150c22 45%,
+      #0c0713 100%
+    );
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-scene .ar-mark-a {
+    right: auto;
+    left: calc(626px - var(--ar-group-x));
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-scene .ar-mark-b {
+    right: auto;
+    left: calc(46px - var(--ar-group-x));
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-hint {
+    right: auto;
+    left: 107px;
+  }
+
+  /* The pull quote is the one layer that cannot simply be mirrored. In
+     English it sits in the pocket the bloom leaves inside the ring; the
+     photograph is not flipped with the layout, so on the Arabic side that
+     pocket is where the flower actually is — its ink runs to x 140 between
+     y 310 and y 530, against a ring arc that is only at x 13-50 there, so
+     nothing wider than ~90px fits and the copy would land on the petals.
+
+     The equivalent pocket on this side is the low one, between the ring's
+     lower-left arc and the leaf sweeping away from the stem: the flower's
+     ink starts at x 218 at y 600 and retreats from there, so a 158px
+     measure at x 36 clears it by 24px at its tightest and by more all the
+     way down. It keeps the quote's relationship to everything else — still
+     inside the ring, still on the far side of the dashed guide from the
+     copy — and it is re-leaded because Tahoma's Arabic sets wider and
+     taller than EB Garamond. */
+  html[dir='rtl'] .home-page .ar-hero-quote {
+    right: auto;
+    left: calc(36px - var(--ar-group-x));
+    /* `--hero-lift` only. That one rides with the bloom and the ring, so the
+       clearance measured above is preserved at every breakpoint;
+       `--quote-lift` is an *extra* rise the English quote can afford because
+       the space it rises into is empty on that side, and this one cannot. */
+    /* 465 = the 555 placement raised 90px; horizontal position, width
+       and leading are unchanged. */
+    top: calc(465px - var(--hero-lift));
+    width: 158px;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-quote blockquote {
+    margin-top: 20px;
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-quote figcaption {
+    margin-top: 26px;
+  }
+
+  /* The copy column, right-anchored on the English gutter — its parent is
+     already nudged 30px right, so that much comes back off the margin. The
+     580px cap is the separation rule: it puts the text zone's left edge at
+     x 744 on the 1440 canvas, clear of the bloom's box (which ends at 672)
+     and 119px clear of the ring, so no line can reach the flower. */
+  html[dir='rtl'] .home-page .ar-hero-copy {
+    /* Offset, not a negative margin: Selected Work keeps its own flow position. */
+    position: relative;
+    top: -20px;
+    width: 580px;
+    margin-left: auto;
+    /* +120 pulls the whole right-hand block (eyebrow, headline, subtitle,
+       categories, CTAs) 120px further from the right edge. RTL and the right
+       alignment are untouched. */
+    margin-right: calc(var(--content-pl) + 180px);
+  }
+
+  html[dir='rtl'] .home-page .home-hero-copy {
+    text-align: right;
+  }
+
+  /* One restrained step on the hero pair, in the Arabic hero only, so the
+     enlarged column keeps its hierarchy. The shared pill metrics, gradient,
+     border and hover behaviour are untouched. */
+  html[dir='rtl'] .home-page .ar-hero-copy [data-motion='hero-cta'] {
+    font-size: 25px;
+  }
+
+  /* Arabic Selected Work label: a touch larger so the Arabic setting reads,
+     and 33px further from the right gutter. The margin sits on the h2, not on
+     the [data-motion='work-label'] span GSAP owns, so the rows are untouched. */
+  /* Selected Work is a block narrower than its column, so RTL resolves the
+     over-constrained margins on the *left* and the whole section — heading and
+     both rows — drifts right of the English track. Pinning the auto margin on
+     the right puts the section box back on the English gutter, so the rows
+     start at exactly the English far-left x, while the heading inside it stays
+     right-aligned on the section's own right edge. Nothing here touches the
+     track, the loop, drag, hover or card order. */
+  html[dir='rtl'] .home-page #selected-work {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  html[dir='rtl'] .home-page #selected-work > h2 {
+    font-size: 18px;
+  }
+
+  /* ── Arabic Home WHAT I DO ────────────────────────────────────────
+     The grid is right-anchored under RTL, which leaves the three columns
+     sitting a touch right of centre in the viewport. The whole group —
+     numerals, titles, bodies, hairlines and the plus mark — rides one
+     relative offset so the internal spacing is fixed by construction.
+     A relative inset, not a transform: GSAP owns `transform` on every
+     motion hook inside this section. */
+  html[dir='rtl'] .wid-group {
+    left: -45px;
+  }
+
+  /* Tahoma at 17px/0.55 alpha is thin and low-contrast for Arabic, which
+     carries more of its meaning in the dots and small marks than the Latin
+     face does. One step up in size, weight and tone; the 36px titles keep
+     the hierarchy by size, and the two-line measure is unchanged, so the
+     section height and every motion hook stay as they are. */
+  html[dir='rtl'] .wid-group [data-motion='wid-body'] {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.7;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  /* ── Arabic Home closing CTA ──────────────────────────────────────
+     A straight mirror of the English offsets put the pill and the sparkle in
+     the band's left half, where the tulip already lives. Arabic reads right to
+     left, so the group is re-laid from the right edge instead, in the English
+     band's own rhythm: headline, then the hairline 151px past its measure,
+     then the pill 93px past that, then the sparkle 60px past the pill — the
+     same four gaps English holds, taken from the other side. The visual keeps
+     its authored left corner and the pill's left edge stops 230px clear of it.
+     Section height, colours, type and every `data-motion` hook are untouched;
+     only insets are written, so GSAP keeps `transform` on all of them. */
+  html[dir='rtl'] .ar-home-cta [data-motion='cta-rule'] {
+    left: 0;
+    right: var(--content-pl);
+  }
+
+  html[dir='rtl'] .ar-home-cta h2 {
+    margin-left: 0;
+    margin-right: 109px;
+  }
+
+  html[dir='rtl'] .ar-home-cta [data-motion='cta-divider'] {
+    left: auto;
+    right: 480px;
+  }
+
+  html[dir='rtl'] .ar-home-cta [data-motion='cta-button-wrap'] {
+    left: auto;
+    right: 573px;
+  }
+
+  html[dir='rtl'] .ar-home-cta [data-motion='cta-sparkle'] {
+    left: auto;
+    right: 933px;
+  }
+
+  /* ── Arabic /work hero ─────────────────────────────────────────────
+     Same treatment as the Arabic Home fold: the composition is mirrored per
+     layer, never shifted as a block. Ring, bloom and the three marks each
+     take from the physical left the offset they hold from the right of the
+     1288 track in English, so the group lands on the far left in exactly the
+     reference arrangement; the lede then takes its 628px from the right, which
+     puts its left edge at x 354 against the bloom box's 352 — the same 2px
+     clearance the English composition holds on the other side. Title and
+     eyebrow need nothing: they are block lines and RTL already right-aligns
+     them on the page gutter.
+
+     Physical insets rather than logical ones, because the scene is
+     deliberately `direction: ltr` above so the artwork keeps its authored
+     orientation. Only insets are written, so GSAP keeps `transform`,
+     the depth ladder, the pointer parallax and the plate camera untouched. */
+  html[dir='rtl'] .work-page [data-motion='work-scene'] [data-motion='ring'] {
+    right: auto;
+    left: 9px;
+  }
+
+  html[dir='rtl'] .work-page [data-motion='work-scene'] [data-motion='tulip'] {
+    right: auto;
+    left: -4px;
+  }
+
+  html[dir='rtl'] .work-page .work-mark-a {
+    right: auto;
+    left: 131px;
+  }
+
+  html[dir='rtl'] .work-page .work-mark-b {
+    right: auto;
+    left: -1px;
+  }
+
+  html[dir='rtl'] .work-page .work-mark-c {
+    right: auto;
+    left: 347px;
+  }
+
+  html[dir='rtl'] .work-page [data-motion='lede'] {
+    left: auto;
+    right: 628px;
+  }
+
+  /* ── Arabic /about hero ────────────────────────────────────────────
+     Mirrored per layer on the 1440 track, never translated as a block.
+     Every layer here is authored with a physical `left`, and the mirror of
+     a box at [L, L+W] is [1440-L-W, 1440-L] — whose distance from the right
+     edge is L exactly. So each rule is the element's own English `left`
+     re-read as a `right`, which is width-agnostic and keeps every internal
+     gap by construction: the quote still sits 16px off the bloom, inside
+     the ring, and the statement column still holds the 86px page gutter —
+     on the other side. Only insets are written, so GSAP keeps `transform`
+     on the whole group and the entrance, pointer lean and idle drift are
+     untouched. */
+  html[dir='rtl'] .about-hero > p,
+  html[dir='rtl'] .about-hero > h1,
+  html[dir='rtl'] .about-hero > [data-motion='rule'] {
+    left: auto;
+    right: 86px;
+  }
+
+  /* The hero rules grow out of the gutter, which is now the right edge.
+     Scoped to the hero: the cards keep their own left-drawn rules. */
+  html[dir='rtl'] .about-hero > [data-motion='rule'] {
+    transform-origin: right center;
+  }
+
+  html[dir='rtl'] .about-hero [data-motion='ring'] {
+    left: auto;
+    right: 748px;
+  }
+
+  html[dir='rtl'] .about-hero [data-motion='tulip'] {
+    left: auto;
+    right: 795px;
+  }
+
+  html[dir='rtl'] .about-hero .about-guide-a {
+    left: auto;
+    right: 1155px;
+  }
+
+  html[dir='rtl'] .about-hero .about-guide-b {
+    left: auto;
+    right: 1024px;
+  }
+
+  html[dir='rtl'] .about-hero .about-mark-a {
+    left: auto;
+    right: 862px;
+  }
+
+  html[dir='rtl'] .about-hero .about-mark-b {
+    left: auto;
+    right: 1272px;
+  }
+
+  html[dir='rtl'] .about-hero .about-mark-c {
+    left: auto;
+    right: 775px;
+  }
+
+  /* The pull quote keeps its place inside the ring, on the guide, with the
+     same 16px it holds off the bloom in English. RTL right-aligns its lines
+     inside the 150px measure, so they hug the tulip side exactly as the
+     English left-aligned lines do. */
+  html[dir='rtl'] .about-hero .about-quote {
+    left: auto;
+    right: 1183px;
+    /* 20px higher than English, so the longer Arabic quote keeps the same air
+       under the signature. The mirror inset and the ring are unchanged. */
+    top: 160px;
+  }
+
+  html[dir='rtl'] .about-hero .about-quote figcaption {
+    margin-left: 0;
+    margin-right: -2px;
+  }
+
+  /* The Arabic statement carries a longer, two-sentence lede than the English
+     one, set three lines deep instead of two. It goes up a size (27px) and a
+     little more open (1.42) so it still reads as the display headline's
+     partner rather than as body copy, and it starts 16px higher so the third
+     line lands with the same air above the 32px closing rule that the English
+     two-line block leaves at 430. The highlight `em`s, the colour, the mask
+     spans and the `lede-line` stagger are the English ones. */
+  html[dir='rtl'] .about-hero .about-lede {
+    top: 306px;
+    font-size: 27px;
+    line-height: 1.42;
+  }
+
+  /* ── Arabic /contact ───────────────────────────────────────────────
+     The same per-layer mirror, on the same 1440 track: statement, detail
+     stack and message panel take their English `left` from the right, and
+     the decorative group goes with them. The tulip's stem still runs on
+     behind the panel and the detail stack still clears the bloom by 149px —
+     both are the English relationships, read from the other edge. Forms,
+     links, field padding and every `data-motion` hook are untouched. */
+  html[dir='rtl'] .contact-statement > p,
+  html[dir='rtl'] .contact-statement > h1,
+  html[dir='rtl'] .contact-statement > [data-motion='rule'] {
+    left: auto;
+    right: 96px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-details {
+    left: auto;
+    right: 96px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-panel {
+    left: auto;
+    right: 730px;
+  }
+
+  /* Rules and row hairlines draw out of the gutter, which is the right edge. */
+  html[dir='rtl'] .contact-page [data-motion='rule'],
+  html[dir='rtl'] .contact-page [data-motion='row-rule'] {
+    transform-origin: right center;
+  }
+
+  html[dir='rtl'] .contact-page [data-motion='ring'] {
+    left: auto;
+    right: 757px;
+  }
+
+  html[dir='rtl'] .contact-page [data-motion='tulip'] {
+    left: auto;
+    right: 812px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-mark-a {
+    left: auto;
+    right: 776px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-mark-b {
+    left: auto;
+    right: 1239px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-mark-c {
+    left: auto;
+    right: 1249px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-mark-d {
+    left: auto;
+    right: 1268px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-dots-a {
+    left: auto;
+    right: 1298px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-dots-b {
+    left: auto;
+    right: 1192px;
+  }
+
+  /* ── Arabic /about card band ───────────────────────────────────────
+     Same mirror discipline as the hero: every offset inside a card is an
+     authored physical `left` on the 396px card, so each rule is that same
+     number re-read as a `right`. On top of the mirror the band is re-voiced
+     for Arabic — quieter shell, larger numeral, more air between the three
+     tiers — without moving the band, resizing the cards or touching a single
+     `data-motion` hook, so the entrance stagger and the hover lift / numeral
+     dim / icon swell are exactly the English ones. */
+
+  /* The shell reads as a page block rather than a UI card: a true hairline
+     border, a tighter corner, one quiet graduation instead of a lit panel,
+     and the corner bloom halved and moved to the Arabic reading corner. */
+  html[dir='rtl'] .about-page [data-motion='card'] {
+    border-color: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    background: linear-gradient(196deg, #1B1226 0%, #160E20 56%, #110A19 100%);
+  }
+
+  html[dir='rtl'] .about-page .card-bloom {
+    background-image: radial-gradient(72% 54% at 82% 6%, rgba(127, 75, 165, 0.13) 0%, transparent 72%);
+  }
+
+  /* ── the mirror ── */
+  html[dir='rtl'] .about-page [data-motion='card'] [data-motion='icon'] {
+    left: auto;
+    right: 28px;
+  }
+
+  html[dir='rtl'] .about-page .card-label,
+  html[dir='rtl'] .about-page .card-title,
+  html[dir='rtl'] .about-page .card-tick {
+    left: auto;
+    right: 119px;
+  }
+
+  html[dir='rtl'] .about-page .card-body,
+  html[dir='rtl'] .about-page .card-services,
+  html[dir='rtl'] .about-page .card-split,
+  html[dir='rtl'] .about-page .card-languages,
+  html[dir='rtl'] .about-page .card-stats,
+  html[dir='rtl'] .about-page .card-tools {
+    left: auto;
+    right: 32px;
+  }
+
+  html[dir='rtl'] .about-page [data-motion='card'] [data-motion='mark'] {
+    left: auto;
+    right: 41px;
+  }
+
+  /* The rules inside a card grow out of the card's own gutter, which is now
+     its right edge. Scoped to the band; the hero keeps its own rule. */
+  html[dir='rtl'] .about-page [data-motion='card'] [data-motion='rule'] {
+    transform-origin: right center;
+  }
+
+  /* ── hierarchy ──
+     The numeral stops being a corner detail and becomes the card's graphic
+     ground: half again as large, a touch more present, and set low on the
+     mirrored corner. Still a watermark — the hover dim in `aboutMotion`
+     reads on it exactly as before. */
+  html[dir='rtl'] .about-page [data-motion='numeral'] {
+    right: auto;
+    left: 24px;
+    top: 336px;
+    font-size: 104px;
+    color: rgba(255, 255, 255, 0.075);
+  }
+
+  /* Label recedes, title carries, the tick under it gains a little length —
+     three clearly separate weights instead of two near-equal ones. */
+  html[dir='rtl'] .about-page .card-label {
+    top: 40px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  html[dir='rtl'] .about-page .card-title {
+    top: 58px;
+    font-size: 30px;
+    font-weight: 700;
+  }
+
+  html[dir='rtl'] .about-page .card-tick {
+    top: 121px;
+    width: 34px;
+  }
+
+  /* Air between the three tiers: the body drops 10px and opens up, which is
+     also the readability fix — Tahoma at 1.75 with more contrast. */
+  html[dir='rtl'] .about-page .card-body {
+    top: 152px;
+    width: 268px;
+    line-height: 1.75;
+    color: rgba(255, 255, 255, 0.84);
+  }
+
+  /* The corner mark clears the taller Arabic lower content. */
+  html[dir='rtl'] .about-page [data-motion='card'] [data-motion='mark'] {
+    top: 442px;
+  }
+
+  /* ── 01 — services ──
+     Five services instead of four, so the grid runs three even rows on two
+     equal columns rather than a wide/narrow pair, and the divider and the
+     languages block follow it down. */
+  html[dir='rtl'] .about-page .card-services {
+    top: 248px;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 18px;
+  }
+
+  html[dir='rtl'] .about-page .card-services li {
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  html[dir='rtl'] .about-page .card-split {
+    top: 352px;
+  }
+
+  html[dir='rtl'] .about-page .card-languages {
+    top: 374px;
+    gap: 20px;
+  }
+
+  html[dir='rtl'] .about-page .card-languages p {
+    font-weight: 700;
+  }
+
+  html[dir='rtl'] .about-page .card-languages ul {
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* ── 02 — experience ── */
+  html[dir='rtl'] .about-page .card-stats {
+    top: 288px;
+  }
+
+  html[dir='rtl'] .about-page .card-stats p:last-child {
+    color: rgba(255, 255, 255, 0.66);
+  }
+
+  /* ── 03 — tools ──
+     Four tiles a size up, evenly spread across the card's own measure, with
+     the labels stepped down and back so the marks lead and the names follow. */
+  html[dir='rtl'] .about-page .card-tools {
+    top: 288px;
+    width: 332px;
+    gap: 0;
+    justify-content: space-between;
+  }
+
+  html[dir='rtl'] .about-page .tool-tile {
+    width: 68px;
+    height: 68px;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  html[dir='rtl'] .about-page .tool-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* ── side rail ──
+     Arabic set in `writing-mode: vertical-rl` renders its glyphs rotated and
+     the left rail runs bottom-to-top, which reads as an accident rather than
+     a detail. Rather than leave it weak, the words go and the hairline stays:
+     a quiet editorial tick on each gutter. The `rail` hooks are untouched, so
+     both still arrive on the entrance. */
+  html[dir='rtl'] .about-page .about-rail-text {
+    display: none;
+  }
+
+  /* ── Arabic /work hero type ────────────────────────────────────────
+     The two masked lines are cut to `leading-[0.94]` and already carry a
+     `pb / -mb` pair so descenders clear the `overflow-hidden` box. Arabic
+     needs the same pair at the *top*: its dots and diacritics sit above the
+     line, and at 0.94 leading the half-leading is negative, so the mask edge
+     lands inside them. Padding opens the clip box upward and the matching
+     negative margin puts the line box back on the pixel it was on, so the
+     size, face, position and the `yPercent` reveal are untouched — the line
+     still rises into a mask, that mask just starts higher. */
+  html[dir='rtl'] .work-page .work-title {
+    padding-top: 0.18em;
+    margin-top: calc(13px - 0.18em);
+  }
+
+  html[dir='rtl'] .work-page .work-eyebrow {
+    padding-top: 0.14em;
+    margin-top: -0.14em;
+  }
+
+  /* The pale straw reads as washed out under Tahoma's lighter Arabic stems.
+     Same family, taken deeper and far richer, and the label goes to Tahoma
+     Bold — on this ground the weight and the chroma are what buy the
+     legibility, since the straw was already light. Set as the token on the
+     page root, so every gold on the Arabic /work hero moves together. */
+  html[dir='rtl'] .work-page {
+    --color-beige: #F2C65C;
+  }
+
+  html[dir='rtl'] .work-page [data-motion='eyebrow-line'] {
+    font-weight: 700;
+  }
+}
+
+
+
+/* Base rules must live in the base layer so Tailwind utilities can override them. */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    min-height: 100svh;
+    background-color: var(--color-bg);
+    color: var(--color-white);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  a {
+    color: inherit;
+    font: inherit;
+    text-decoration: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    font-weight: 500;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-purple-light);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-purple);
+    color: var(--color-white);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ── Homepage: desktop short-height pass ─────────────────────────────
+   The homepage is authored against a 1440 x 1088 canvas. On laptop
+   screens that are wide enough for the desktop composition but far
+   shorter than 1088 (1366x768, 1440x900, 1280x720), the whole canvas is
+   scaled down proportionally with `zoom` and its vertical rhythm is
+   tightened via the custom properties below, so the reference
+   composition is preserved rather than reflowed.
+
+   `--hero-lift` always equals the sum of the `--page-pt` and
+   `--hero-top` reductions, so the absolutely positioned right-hand
+   group (tulip, ring, guide, plus marks, quote) rises by exactly as
+   much as the left column does and the two stay locked together.
+
+   Above 980px tall nothing applies and the 1440x1088 design is
+   untouched. */
+@layer components {
+  .home-canvas {
+    --page-zoom: 1;
+    --page-pt: 43px;
+    --page-pb: 62px;
+    --hero-top: 67px;
+    --hero-gap-sub: 48px;
+    --hero-gap-cta: 32px;
+    --work-top: 195px;
+    --work-gap: 18px;
+    --content-pl: 86px;
+    --nav-pl: 66px;
+    --track-w: 100%;
+    --tulip-shift: 0px;
+    --hero-lift: 0px;
+    --quote-lift: 0px;
+
+    /* One screen, in canvas units. The fold's decorative layers are pinned to
+       this rather than to their wrapper, so the wrapper can grow past the first
+       screen (the work rows break the fold) without dragging them along. */
+    --screen: calc(100svh / var(--page-zoom));
+
+    zoom: var(--page-zoom);
+  }
+
+  /* The right-hand composition rides a 1440-wide centred track, so widening
+     the canvas past the design width never pulls it off its reference spot. */
+  .home-track {
+    width: min(100%, var(--track-w));
+    margin-inline: auto;
+  }
+
+  .home-canvas,
+  .home-fill {
+    min-height: var(--screen);
+  }
+
+  @media (min-width: 1024px) and (max-height: 980px) {
+    .home-canvas {
+      --page-zoom: 0.93;
+      --page-pt: 40px;
+      --page-pb: 50px;
+      --hero-top: 55px;
+      --hero-gap-sub: 40px;
+      --hero-gap-cta: 30px;
+      --work-top: 128px;
+      --work-gap: 17px;
+      --content-pl: 26px;
+      --nav-pl: 26px;
+      --track-w: 1440px;
+      --tulip-shift: 30px;
+      --hero-lift: 15px;
+      --quote-lift: 50px;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 880px) {
+    .home-canvas {
+      --page-zoom: 0.87;
+      --page-pt: 36px;
+      --page-pb: 40px;
+      --hero-top: 50px;
+      --hero-gap-sub: 34px;
+      --hero-gap-cta: 27px;
+      --work-top: 104px;
+      --work-gap: 16px;
+      --hero-lift: 24px;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 790px) {
+    .home-canvas {
+      --page-zoom: 0.8;
+      --page-pt: 28px;
+      --page-pb: 30px;
+      --hero-top: 34px;
+      --hero-gap-sub: 28px;
+      --hero-gap-cta: 24px;
+      --work-top: 80px;
+      --work-gap: 14px;
+      --hero-lift: 48px;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 700px) {
+    .home-canvas {
+      --page-zoom: 0.73;
+    }
+  }
+}
+
+/* ── Homepage: sections below the hero fold ──────────────────────────
+   The fold is authored against the 1440 x 1088 reference canvas and is
+   left-anchored (left column from the viewport edge, decorative group
+   right-anchored). Everything under it shares one left-anchored content
+   column on the same `--content-pl` gutter, so the Selected Work rows,
+   services columns, belief block and footer all line up with the hero
+   headline at any viewport width. */
+@layer components {
+  .home-section {
+    width: 100%;
+    max-width: 1440px;
+    padding-inline: var(--content-pl);
+  }
+}
+
+/* ── Motion foundation ───────────────────────────────────────────────
+   Support layer for `src/motion/`. It defines no animation of its own —
+   the tweens all live in JS — it only makes the JS safe to run.
+
+   `data-motion` is stamped on <html> by `useSmoothScroll`: `ready` when
+   the motion engine is live, `reduced` when the visitor has asked for
+   less motion, and absent entirely if the bundle never ran. Elements
+   that start hidden are therefore only hidden while something is
+   guaranteed to reveal them — a JS failure leaves the page fully
+   readable rather than blank. */
+@layer components {
+  /* Opt in with `data-reveal` and pass the element to `reveal()`. */
+  [data-motion='ready'] [data-reveal] {
+    visibility: hidden;
+  }
+
+  /* Layers handed to `parallax()` and the magnetic utility are promoted
+     once, here, instead of GSAP thrashing will-change each frame. */
+  [data-parallax],
+  [data-magnetic] {
+    will-change: transform;
+  }
+
+  /* Text handed to the `lines` / `words` / `chars` reveals. SplitText
+     builds the masks; this only stops a wrap flashing before it does. */
+  [data-motion='ready'] [data-reveal-text] {
+    visibility: hidden;
+  }
+
+  /* Per-page opt-in for surrendering the native arrow to `CustomCursor`.
+     Deliberately not the default: the site cursor is an enhancement, and
+     the native one is what keeps text selection and links legible. */
+  .cursor-none,
+  .cursor-none * {
+    cursor: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal],
+    [data-reveal-text] {
+      visibility: visible;
+    }
+
+    [data-parallax],
+    [data-magnetic] {
+      will-change: auto;
+      transform: none;
+    }
+  }
+}
