@@ -99,7 +99,12 @@
   /* The whole mirrored group — ring, guide, bloom, marks and the quote —
      rides one offset so its internal spacing is fixed by construction. */
   html[dir='rtl'] .home-page {
-    --ar-group-x: 36px;
+    /* 36 (original mirror nudge) + 75, less 50: the whole composition —
+       bloom, ring, guide, marks and the quote inside the ring — rides one
+       offset back out by 50px. Both variables move by the same 50, so the
+       group's internal spacing is unchanged by construction. */
+    --ar-group-x: 85px;
+    --ar-quote-x: 101px;
   }
 
   html[dir='rtl'] .home-page .ar-hero-scene [data-motion='ring'] {
@@ -123,11 +128,13 @@
        the box no longer sits under the page gradient's right shoulder, so the
        English 30% centre painted a ground ~10 luma under the page and `lighten`
        kept it — that is the black plate. The page gradient's centre is at
-       66% x 1440 = 950px; the box now starts at 26px + --tulip-shift, so the
-       same point is that far into it. Radii (165% / 80%) and the stops are
-       unchanged, so nothing about the mask, the blend or the clip moves. */
+       66% x 1440 = 950px; the box now starts at 76px + --tulip-shift (26 plus
+       the 50 the group moved back out), so the same point is that far into it.
+       Radii (165% / 80%) and the stops are unchanged, so nothing about the
+       mask, the blend or the clip moves — only where the veil is sampled, so
+       it still matches the page exactly and cannot read as a plate. */
     --tulip-veil: radial-gradient(
-      165% 80% at calc(924px - var(--tulip-shift)) 27%,
+      165% 80% at calc(874px - var(--tulip-shift)) 27%,
       #26123a 0%,
       #150c22 45%,
       #0c0713 100%
@@ -166,14 +173,17 @@
      taller than EB Garamond. */
   html[dir='rtl'] .home-page .ar-hero-quote {
     right: auto;
-    left: calc(36px - var(--ar-group-x));
+    /* The quote takes its own offset rather than the group's: it moves 30px
+       in where the artwork moves 36px, so it keeps its pocket inside the
+       ring. -145 was its former resolved left; 151 puts it at -115. */
+    left: calc(36px - var(--ar-quote-x));
     /* `--hero-lift` only. That one rides with the bloom and the ring, so the
        clearance measured above is preserved at every breakpoint;
        `--quote-lift` is an *extra* rise the English quote can afford because
        the space it rises into is empty on that side, and this one cannot. */
     /* 465 = the 555 placement raised 90px; horizontal position, width
        and leading are unchanged. */
-    top: calc(465px - var(--hero-lift));
+    top: calc(450px - var(--hero-lift));
     width: 158px;
   }
 
@@ -201,7 +211,9 @@
     /* +120 pulls the whole right-hand block (eyebrow, headline, subtitle,
        categories, CTAs) 120px further from the right edge. RTL and the right
        alignment are untouched. */
-    margin-right: calc(var(--content-pl) + 180px);
+    /* 180 + the same 75px the artwork group takes, so tulip, headline,
+       supporting copy and signature keep their exact relationship. */
+    margin-right: calc(var(--content-pl) + 209px);
   }
 
   html[dir='rtl'] .home-page .home-hero-copy {
@@ -213,6 +225,97 @@
      border and hover behaviour are untouched. */
   html[dir='rtl'] .home-page .ar-hero-copy [data-motion='hero-cta'] {
     font-size: 25px;
+  }
+
+  /* Arabic hero headline type, Arabic hero only.
+
+     Tahoma is the interface fallback, not a display face — at 96px its
+     Arabic reads flat and its 1.21em content area forced the 1.24 leading
+     that pulled the three lines apart. Tajawal 800 is a display-weight
+     Arabic grotesque with the same clean, non-calligraphic letterforms,
+     so the block gets its editorial weight without costing legibility. */
+  html[dir='rtl'] .home-page .ar-hero-copy h1 {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.005em;
+    /* The clipped diacritics under بصري were the mask itself: the clip IS the
+       line box, and at 1.24 Tajawal's marks fall below it. The box is opened
+       to 1.44 so they sit inside it, and the extra height is taken straight
+       back off the gap below, so the block's spacing is unchanged. */
+    line-height: 1.44;
+  }
+
+  /* The gap closes here rather than on `line-height`: each line sits in its
+     own `overflow-hidden` clip whose height IS the line box, so tightening
+     the leading would cut the glyphs the entrance masks slide. The line box
+     stays 1.24 and the clips are pulled together instead — visually ~1.07,
+     with every mask, stagger and `data-motion` hook untouched. */
+  html[dir='rtl'] .home-page .ar-hero-copy h1 > span + span {
+    margin-top: -0.37em;
+  }
+
+  /* Arabic hero colour, Arabic hero only. Tahoma's Arabic sets lighter than
+     Anton and EB Garamond at the same value, so the English tints read pale
+     here; every rule below only re-tints, and leaves the size, weight,
+     leading, hierarchy and every `data-motion` hook exactly as they are. */
+
+  /* Headline, in two groups: the first word takes a deep plum accent, the
+     two that complete the phrase take a brighter lilac, so the statement
+     reads as one line broken in two rather than three equal words. */
+  html[dir='rtl'] .home-page .ar-hero-copy h1 > span:first-child {
+    color: #A25CCB;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-copy h1 > span:first-child ~ span {
+    color: #DBBBF6;
+  }
+
+  /* The gold pair: the eyebrow steps from the pale beige to a deeper gold,
+     and the signature loses its 80% veil for the same tone at full strength. */
+  html[dir='rtl'] .home-page .ar-hero-copy [data-motion='hero-eyebrow'] {
+    /* One step up in size and weight, still well under the headline. */
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: #D6A947;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-quote figcaption {
+    color: #D8B25A;
+  }
+
+  /* Supporting copy: one step up in contrast, still tinted rather than white. */
+  html[dir='rtl'] .home-page .ar-hero-copy [data-motion='hero-subtitle'] {
+    color: #D9BCF1;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-quote blockquote {
+    color: #E2DAEA;
+  }
+
+  /* The type inside the ring, Arabic hero only. It sits on the deepest part
+     of the backdrop, where EB Garamond at 70% white all but disappears; the
+     Arabic line takes the headline's Tajawal at a text weight so it reads as
+     the same voice, and the tints step up for contrast. Size, leading, width,
+     the ring itself and every `data-motion` hook are unchanged. */
+  html[dir='rtl'] .home-page .ar-hero-quote blockquote {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
+    /* The tulip's own lilac rather than an off-white, so the line inside the
+       ring belongs to the bloom it sits on. */
+    color: #DFC4F7;
+  }
+
+  /* The opening mark, out of its 65% veil so it holds the line's new weight. */
+  html[dir='rtl'] .home-page .ar-hero-quote [aria-hidden='true'] {
+    color: #C6A2E8;
+  }
+
+  html[dir='rtl'] .home-page .ar-hero-quote figcaption {
+    /* A cleaner, more modern hand than Allura — same gold, same size. */
+    font-family: 'Dancing Script', 'Allura', cursive;
+    font-weight: 600;
+    color: #E3B65E;
   }
 
   /* Arabic Selected Work label: a touch larger so the Arabic setting reads,
@@ -257,6 +360,131 @@
     color: rgb(255 255 255 / 0.82);
   }
 
+  /* ── Arabic Home belief band (التصميم هو تواصل) ───────────────────
+     Placement first. The band is authored as one absolutely-positioned
+     composition — frame, tulip crop, eyebrow, rule, marks, statement, note
+     and signature all hang off the same `belief-band` box — so the whole
+     scene takes one 56px step left on the band itself rather than on eight
+     separate offsets. Every internal gap therefore survives by construction,
+     and it is a relative inset, not a transform: GSAP owns `transform` on the
+     plane, the marks, the note, the signature and every masked line. The band
+     keeps its authored 500px height, so the section height is unchanged. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-band'] {
+    left: -56px;
+  }
+
+  /* Second placement pass: the copy alone takes a further 96px left, the
+     media stays where the band put it. Every text layer — eyebrow, its
+     hairline, both plus marks, the statement, the note and the signature —
+     is authored from the same physical left inside the band, so each simply
+     loses 96 from its own offset and the group's internal spacing is
+     unchanged. Insets, not transforms: GSAP owns `x`/`y` on the marks, the
+     note and the signature, and `yPercent` on every masked line.
+
+     The eyebrow is addressed through its paragraph — `belief-label` is the
+     masked span inside it, which is static and would ignore an inset — and
+     the two marks through their span position in the band, since they share
+     one `data-motion` value: the rule is the band's first span, so the marks
+     are its second and third. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-band'] > p:first-of-type {
+    left: -96px;
+  }
+
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-rule'] {
+    left: -96px;
+  }
+
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-mark']:nth-of-type(2) {
+    left: 114px;
+  }
+
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-mark']:nth-of-type(3) {
+    left: 109px;
+  }
+
+  html[dir='rtl'] .home-page .ar-belief h2,
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-note'] {
+    left: 184px;
+  }
+
+  /* The signature is the one exception to the flat 96: the note and the
+     signature sit side by side on the same line, so the gap between them is
+     horizontal. It takes the group's shift less 28px, opening that gap from
+     43 to 71 without moving anything else. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-signature'] {
+    left: 575px;
+  }
+
+  /* The frame's top edge is the one rule that reads as a stray line across
+     the Arabic composition — the crop's own top sits below it, so the border
+     hangs unattached above the bloom. Only that edge goes; the frame's other
+     three sides, its box, its size and its clip-path entrance are untouched. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-frame'] {
+    border-top-width: 0;
+  }
+
+  /* Type. Anton never renders the Arabic here — the base layer already swaps
+     `.font-display` for Tahoma — and Tahoma at 107px/0.9 sets flat and clips.
+     Tajawal 800 is the same display-weight, non-calligraphic grotesque the
+     Arabic hero runs on, so the two headlines read as one voice. The leading
+     opens from 0.9 to 1.02: still tight enough to read as a single statement,
+     and safe, since the mask clip is `inset(-34% …)` and grows past the line
+     box. Absolutely positioned, so nothing below it moves. */
+  html[dir='rtl'] .home-page .ar-belief h2 {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+  }
+
+  /* The statement broken in two tones rather than three equal words: the
+     opening plum carries the phrase, the brighter lilac completes it. */
+  html[dir='rtl'] .home-page .ar-belief h2 > span:first-child {
+    color: #7e2fa3;
+  }
+
+  html[dir='rtl'] .home-page .ar-belief h2 > span:first-child ~ span {
+    color: #a95bd0;
+  }
+
+  /* The full stop is a mark of the headline, so it takes the gold rather
+     than the pale beige. Size, position and its scale-in are unchanged. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-dot'] {
+    background-color: #d4af37;
+  }
+
+  /* Supporting line: EB Garamond has no Arabic, so this was falling to Tahoma
+     at 70% white — pale and thin against the bloom. Tajawal at a text weight,
+     one step up in size and on a warm lavender-grey, still well under the
+     headline. The 320px measure and the two-line depth are unchanged. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-note'] {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.8;
+    color: #d9d0e2;
+  }
+
+  /* Eyebrow: the same Tajawal at a label weight, on the refined metallic gold
+     #D4AF37 the headline's full stop also takes. The old #D6A947 read as a
+     bright yellow at this size against the plum. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-label'] {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: #d4af37;
+  }
+
+  /* The signature stays Latin and stays gold — a cleaner hand than Allura,
+     matching the Arabic hero's caption. It takes the deeper #C9A24A of the
+     pair, so it reads as the quieter half of the same metal rather than
+     competing with the eyebrow. */
+  html[dir='rtl'] .home-page .ar-belief [data-motion='belief-signature'] {
+    font-family: 'Dancing Script', 'Allura', cursive;
+    font-weight: 600;
+    color: #c9a24a;
+  }
+
   /* ── Arabic Home closing CTA ──────────────────────────────────────
      A straight mirror of the English offsets put the pill and the sparkle in
      the band's left half, where the tulip already lives. Arabic reads right to
@@ -272,24 +500,29 @@
     right: var(--content-pl);
   }
 
+  /* The four offsets below each carry the same +56px the belief band takes,
+     so the closing statement, its note, the signature and this pill read as
+     one group stepping left together; the gaps between them are unchanged.
+     The hairline above is the band's frame, not part of the group, so it
+     keeps the section's own edges. */
   html[dir='rtl'] .ar-home-cta h2 {
     margin-left: 0;
-    margin-right: 109px;
+    margin-right: 165px;
   }
 
   html[dir='rtl'] .ar-home-cta [data-motion='cta-divider'] {
     left: auto;
-    right: 480px;
+    right: 536px;
   }
 
   html[dir='rtl'] .ar-home-cta [data-motion='cta-button-wrap'] {
     left: auto;
-    right: 573px;
+    right: 629px;
   }
 
   html[dir='rtl'] .ar-home-cta [data-motion='cta-sparkle'] {
     left: auto;
-    right: 933px;
+    right: 989px;
   }
 
   /* ── Arabic /work hero ─────────────────────────────────────────────
@@ -312,9 +545,20 @@
     left: 9px;
   }
 
+  /* The tulip composition is grown 13% about its own centre rather than
+     re-placed: 356×475 becomes 402×537 and each inset moves by half the
+     growth (-4 → -27, -34 → -65), so the centre stays on x 174 / y 203.5 and
+     keeps the offset it holds from the ring's centre. `object-contain` /
+     `object-center` hold the artwork on that centre, and the box already
+     overflowed the 213px plate top and bottom, so nothing new clips. Only
+     insets and the box are written — `transform`, the depth ladder and the
+     pointer parallax stay GSAP's. */
   html[dir='rtl'] .work-page [data-motion='work-scene'] [data-motion='tulip'] {
     right: auto;
-    left: -4px;
+    left: -27px;
+    top: -65px;
+    width: 402px;
+    height: 537px;
   }
 
   html[dir='rtl'] .work-page .work-mark-a {
@@ -332,9 +576,12 @@
     left: 347px;
   }
 
+  /* The lede is absolutely placed, so 22px up is its own `top` and nothing
+     else on the plate moves. Width and the mirrored 628px are untouched. */
   html[dir='rtl'] .work-page [data-motion='lede'] {
     left: auto;
     right: 628px;
+    top: 47px;
   }
 
   /* ── Arabic /about hero ────────────────────────────────────────────
@@ -426,6 +673,195 @@
     line-height: 1.42;
   }
 
+  /* ── Arabic /about hero: type, tone and the two decorative centres ──
+     A refinement pass on the mirror above, Arabic /about hero only. Nothing
+     here re-places a layer as a block: the statement column steps left off
+     the mirrored gutter (a larger `right`, since right IS the gutter in
+     RTL), the two decorative centres are held by construction, and every
+     `data-motion` hook, mask span, stagger and transform stays GSAP's. */
+
+  /* Eyebrow: 20px left off the gutter, 9px up, one step larger, and the
+     display-weight Tajawal instead of the Tahoma fallback. Its own `p` is
+     the mask, so the box is opened under the baseline for Tajawal's marks
+     rather than left to clip them. */
+  html[dir='rtl'] .about-hero > p:first-of-type {
+    right: 106px;
+    top: 61px;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+    padding-bottom: 0.24em;
+    /* The pale beige goes to the deeper metallic gold the Arabic Home fold
+       already carries, which holds against the plum ground. */
+    color: #D6A947;
+  }
+
+  /* Headline: the group moves 18px left and 10px up. */
+  html[dir='rtl'] .about-hero > h1 {
+    right: 104px;
+    top: 108px;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.005em;
+    /* The clipped dots under بصري are the mask itself: each line sits in an
+       `overflow-hidden` span whose height IS the line box, and at 1.17 the
+       marks fall below it. The box is opened to 1.44 so they sit inside —
+       the root cause, not a translate — and the height that buys is taken
+       straight back off the gap below. */
+    line-height: 1.44;
+  }
+
+  /* ~10px between the lines, closed on the clips rather than on
+     `line-height`, so the mask the entrance slides keeps its full glyph. */
+  html[dir='rtl'] .about-hero > h1 > span + span {
+    margin-top: -0.30em;
+  }
+
+  /* مصمّمة تواصل takes the deep plum, بصري the brighter lilac — the Arabic
+     Home fold's pairing, so the phrase reads as one statement broken in two
+     and sits off the washed-out white. */
+  html[dir='rtl'] .about-hero > h1 > span:first-child {
+    color: #A25CCB;
+    /* 20px further left again, so the longer first line reads centred over
+       the short one. Margin on the clip, not a transform on the line. */
+    margin-right: 20px;
+  }
+
+  html[dir='rtl'] .about-hero > h1 > span:first-child ~ span {
+    color: #DBBBF6;
+  }
+
+  /* Lede: 20px left off the gutter, RTL alignment untouched, Tajawal at a
+     text weight on a light lavender neutral instead of veiled white. */
+  html[dir='rtl'] .about-hero .about-lede {
+    right: 106px;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 500;
+    color: #E3D3F5;
+  }
+
+  /* Same mask story as the headline, one size down: the per-line clip is
+     opened under the baseline and the added height is taken back off the
+     line above, so the three-line block keeps its place over the 430 rule. */
+  html[dir='rtl'] .about-hero .about-lede > span {
+    padding-bottom: 0.16em;
+  }
+
+  html[dir='rtl'] .about-hero .about-lede > span + span {
+    margin-top: -0.16em;
+  }
+
+  /* The tulip grows 13% about its own centre rather than being re-placed:
+     372×492 becomes 420×556 and each inset moves by half the growth, so the
+     centre holds x 981 / y 266 and keeps its relationship to the ring. Only
+     the box and its insets are written — `object-contain` / `object-center`
+     hold the artwork, and the pointer parallax and depth ladder stay GSAP's.
+     The box still clears both track edges, so nothing new clips. */
+  html[dir='rtl'] .about-hero [data-motion='tulip'] {
+    right: 771px;
+    top: -12px;
+    width: 420px;
+    height: 556px;
+  }
+
+  /* The ring rises 18px onto the grown bloom; its mirrored inset is kept, so
+     the two stay on the same vertical. */
+  html[dir='rtl'] .about-hero [data-motion='ring'] {
+    top: 47px;
+  }
+
+  /* The quote inside the ring: the headline's Tajawal at a text weight, more
+     leading and a stronger lilac, since EB Garamond at 72% white all but
+     disappears on the deepest part of the backdrop. The signature keeps its
+     own gold so it stays a separate voice. */
+  html[dir='rtl'] .about-hero .about-quote blockquote {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.85;
+    color: #DFC4F7;
+  }
+
+  html[dir='rtl'] .about-hero .about-quote > span[aria-hidden='true'] {
+    color: #C6A2E8;
+  }
+
+  html[dir='rtl'] .about-hero .about-quote figcaption {
+    color: #D8B25A;
+  }
+
+  /* ── Arabic /about hero: micro-refinement ──────────────────────────
+     Offsets, one weight, and the second Arabic voice. Amiri is added to the
+     existing Google Fonts request and carries the eyebrow and the ring quote:
+     an elegant naskh with real display presence, kept off the headline and
+     the body so the page still reads in Tajawal. Nothing ornate — the joins
+     stay open and the counters stay readable at these sizes. */
+  html[dir='rtl'] .about-hero > p:first-of-type {
+    /* 30px further left off the gutter again, 60 off the mirrored gutter. */
+    right: 166px;
+    top: 51px;
+    /* Amiri, now loaded with the other faces, replaces the platform naskh:
+       a real Arabic display face rather than a font that may not be there. */
+    font-family: 'Amiri', 'Tajawal', Tahoma, Arial, sans-serif;
+    /* 19 → 25px, the asked 30%. */
+    font-size: 25px;
+    font-weight: 700;
+    /* Amiri's descenders run deeper than Tajawal's and the `p` is the mask,
+       so the box is opened under the baseline instead of clipping them. The
+       eyebrow keeps its `top`; the extra height falls into the 53px of air
+       above the rule at 104. */
+    line-height: 1.45;
+    padding-bottom: 0.34em;
+    /* Brighter than the plate gold by one step — more presence, same tone. */
+    color: #E0B45A;
+  }
+
+  /* بصري alone steps 30px left; مصمّمة تواصل keeps its own 20px exactly.
+     Margin on the line's clip, so the reveal mask and its `title-line`
+     transform are untouched and the opened 1.44 line box still holds the
+     dots under the word. */
+  html[dir='rtl'] .about-hero > h1 > span:first-child ~ span {
+    margin-right: 60px;
+    /* One step lighter than the first line, on the same Tajawal, so the short
+       word stops out-weighing the phrase above it. Weight only — the 1.44
+       line box that holds its dots and the reveal mask are untouched. */
+    font-weight: 700;
+  }
+
+  /* The lede block drops 10px more. Width, measure, colour, face and RTL
+     alignment unchanged. */
+  html[dir='rtl'] .about-hero .about-lede {
+    top: 331px;
+  }
+
+  /* Quote, mark and signature rise 40px as one — the `figure` moves, not its
+     parts, so their internal spacing and the `quote-part` stagger hold. */
+  html[dir='rtl'] .about-hero .about-quote {
+    top: 120px;
+  }
+
+  /* The ring quote takes the same Amiri, at the text weight the family
+     actually ships: Amiri has 400 and 700 only, so a 600 request would be
+     synthesised or snap to bold. 400 is the lighter, more elegant of the two
+     and keeps the quote clearly under the eyebrow's 700. Size, leading,
+     measure and every `quote-part` hook are unchanged. */
+  html[dir='rtl'] .about-hero .about-quote blockquote {
+    font-family: 'Amiri', 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 400;
+    color: #E6D3FA;
+  }
+
+  html[dir='rtl'] .about-hero .about-quote > span[aria-hidden='true'] {
+    color: #D2B0EE;
+  }
+
+  /* The tulip drops 10px. Size, centring and the ring's inset are untouched,
+     so the composition's proportions and every motion channel are unchanged. */
+  html[dir='rtl'] .about-hero [data-motion='tulip'] {
+    top: -2px;
+  }
+
   /* ── Arabic /contact ───────────────────────────────────────────────
      The same per-layer mirror, on the same 1440 track: statement, detail
      stack and message panel take their English `left` from the right, and
@@ -496,6 +932,205 @@
     right: 1192px;
   }
 
+  /* ── Arabic /contact — type, contrast and field insets ─────────────
+     A scoped refinement pass on top of the mirror above. Nothing here
+     moves a decorative layer, changes a link target, a value or a
+     `data-motion` hook; the fixes are offsets, family, weight, colour
+     and padding only. These live in `utilities` rather than `components`
+     because every property below overrides a Tailwind arbitrary utility
+     written on the same element — layer order is what decides that, which
+     is why the global RTL field rules in the components layer were being
+     beaten by `left-[20px]` / `pl-[52px]` and the icons stayed on the
+     wrong edge with the Arabic text running into them. */
+
+  /* 1 — eyebrow: 40px further off the gutter (168 -> 208), 30% larger again, and
+     on Amiri at the weight the family actually ships — Amiri carries 400
+     and 700 only, so a 600 request would be synthesised or snap to bold.
+     The metallic gold is unchanged and the rule moves with the word, so
+     the two stay aligned. Tracking stays at zero: Arabic is joined and
+     0.42em tore it apart. The mask is opened further for Amiri's deeper
+     descenders, so no dot or diacritic is clipped. */
+  html[dir='rtl'] .contact-page .contact-statement > p:first-of-type,
+  html[dir='rtl'] .contact-page .contact-statement > [data-motion='rule'] {
+    right: 208px;
+  }
+
+  /* Another 10px up, as a pair: the word and its rule hold the 37px gap the English
+     lockup has, so the underline stays registered to the word. */
+  html[dir='rtl'] .contact-page .contact-statement > [data-motion='rule'] {
+    top: 119px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-statement > p:first-of-type {
+    top: 82px;
+    font-family: 'Amiri', 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 24.34px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.5;
+    padding-bottom: 0.34em;
+    color: #D4AF37;
+  }
+
+  html[dir='rtl'] .contact-page .contact-statement > p:first-of-type [data-motion='eyebrow-line'] {
+    font-weight: 700;
+  }
+
+  /* 2 — the headline block. The lede holds its 126px; the headline alone
+     goes 15px further left, to 141. Anton carries no Arabic, so the base
+     layer was dropping the title to Tahoma at a text weight; Amiri 700 is
+     the premium naskh the Arabic /about hero already runs on, and it reads
+     as a display face where Tajawal read as a UI grotesque. It now sits
+     20px higher, on a clear plum instead of the pale
+     lilac, which was reading as a wash on this ground. */
+  html[dir='rtl'] .contact-page .contact-statement > p:last-of-type {
+    right: 126px;
+  }
+
+  html[dir='rtl'] .contact-page .contact-statement > h1 {
+    top: 162px;
+    right: 141px;
+    font-family: 'Amiri', 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 103px;
+    font-weight: 700;
+    letter-spacing: 0;
+    /* Line spacing stays pinned to what it already measured — 84 x 1.16 —
+       so the size increases change the letterforms and nothing about where
+       the two lines sit relative to each other. */
+    line-height: 97.44px;
+    color: #A95BD0;
+  }
+
+  /* The `ك` clipping, at the root.
+     Each line is masked by its own `overflow-hidden` box whose height is the
+     line box — and the line box is the pinned 97.44px, which is far shorter
+     than Amiri's own ascent + descent at this size. So the kaf's ascender
+     sits *above* the box top and the nun / ra tails below it, and the mask
+     cut them off. The fix is to give the box the missing line-box space
+     rather than to move the word.
+     The slack goes on the inner animated span, not on the mask: the reveal
+     is `yPercent: 112` of that span's own height, so growing the span keeps
+     the offset proportional and the line still starts fully clear of the
+     box. The mask then takes matching negative margins, so the opened box
+     costs nothing in flow — text position and the pinned leading are both
+     exactly what they were. */
+  html[dir='rtl'] .contact-page .contact-statement > h1 > span {
+    padding-bottom: 0;
+    margin-top: -0.36em;
+    margin-bottom: -0.36em;
+  }
+
+  html[dir='rtl'] .contact-page .contact-statement > h1 > span > [data-motion='title-line'] {
+    padding-top: 0.36em;
+    padding-bottom: 0.36em;
+  }
+
+  /* Lede: a clear light-lavender neutral at a text weight, leading opened
+     for Arabic's taller line. No washed-out grey. */
+  html[dir='rtl'] .contact-page .contact-statement > p:last-of-type {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 0;
+    line-height: 1.75;
+    color: #E8DFF0;
+  }
+
+  html[dir='rtl'] .contact-page .contact-statement > p:last-of-type > span {
+    padding-bottom: 0.16em;
+    margin-bottom: -0.16em;
+  }
+
+  /* 3 — the tulip grows 8% about its own centre, so the ring's inset, the
+     crop and the camera origin are all unchanged and nothing clips: the
+     box lands at 31 / 583 inside the 680px stage. */
+  html[dir='rtl'] .contact-page [data-motion='tulip'] {
+    right: 796px;
+    top: 31px;
+    width: 413px;
+    height: 551px;
+  }
+
+  /* 4 — contact rows: labels take the gold at a label weight, values take
+     the same family one step down on a near-white lavender. Icons, badge
+     sizes, row heights, hrefs and values are untouched. */
+  html[dir='rtl'] .contact-page .contact-details div > p[data-motion='row-part']:first-child {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.5;
+    color: #D4AF37;
+  }
+
+  html[dir='rtl'] .contact-page .contact-details a[data-motion='row-part'],
+  html[dir='rtl'] .contact-page .contact-details p[data-motion='row-part'] + p[data-motion='row-part'] {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0;
+    color: #F1EAF7;
+  }
+
+  /* The WhatsApp pill is the one row item on a light ground — same family,
+     same target, just the weight and the joins corrected. */
+  html[dir='rtl'] .contact-page .contact-details a[href^='https://wa.me'] {
+    font-weight: 700;
+    color: #1B0F27;
+  }
+
+  /* 5 — the panel. Heading first. */
+  html[dir='rtl'] .contact-page .contact-panel > h2 {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.5;
+    color: #D4AF37;
+  }
+
+  /* Fields: the icon moves to the reading edge and the text is padded
+     away from it, so the Arabic placeholder no longer runs under the
+     glyph. Borders, radius, heights, gaps and icon size are unchanged. */
+  html[dir='rtl'] .contact-page [data-motion='field'] > span[aria-hidden='true'] {
+    left: auto;
+    right: 20px;
+  }
+
+  html[dir='rtl'] .contact-page [data-motion='field'] input,
+  html[dir='rtl'] .contact-page [data-motion='field'] textarea {
+    padding-right: 54px;
+    padding-left: 18px;
+    text-align: right;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: #F1EAF7;
+  }
+
+  html[dir='rtl'] .contact-page [data-motion='field'] input::placeholder,
+  html[dir='rtl'] .contact-page [data-motion='field'] textarea::placeholder {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 500;
+    color: #B4A6C4;
+  }
+
+  /* The email field is LTR-isolated by the base layer; its own text still
+     starts from the right edge, so it keeps the same inset as the rest. */
+  html[dir='rtl'] .contact-page [data-motion='field'] input[type='email'] {
+    padding-right: 54px;
+    padding-left: 18px;
+  }
+
+  /* 6 — the submit button: functional text, so the same grotesque at a
+     heading weight rather than anything decorative. */
+  html[dir='rtl'] .contact-page [data-motion='send'] {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
   /* ── Arabic /about card band ───────────────────────────────────────
      Same mirror discipline as the hero: every offset inside a card is an
      authored physical `left` on the 396px card, so each rule is that same
@@ -504,6 +1139,10 @@
      tiers — without moving the band, resizing the cards or touching a single
      `data-motion` hook, so the entrance stagger and the hover lift / numeral
      dim / icon swell are exactly the English ones. */
+
+  html[dir='rtl'] .about-page .about-cards {
+    padding-right: 104px;
+  }
 
   /* The shell reads as a page block rather than a UI card: a true hairline
      border, a tighter corner, one quiet graduation instead of a lit panel,
@@ -521,7 +1160,24 @@
   /* ── the mirror ── */
   html[dir='rtl'] .about-page [data-motion='card'] [data-motion='icon'] {
     left: auto;
-    right: 28px;
+    right: 32px;
+    top: 40px;
+    width: 60px;
+    height: 60px;
+    border-color: rgba(192, 143, 224, 0.28);
+    background: radial-gradient(120% 120% at 50% 46%, rgba(127, 75, 165, 0.18) 0%, rgba(127, 75, 165, 0) 74%);
+    box-shadow: inset 0 0 16px rgba(192, 143, 224, 0.1);
+  }
+
+  /* One tone and one stroke across all three header marks. */
+  html[dir='rtl'] .about-page [data-motion='card'] [data-motion='icon'] svg {
+    width: 25px;
+    height: 25px;
+    color: rgba(198, 160, 226, 0.9);
+  }
+
+  html[dir='rtl'] .about-page [data-motion='card'] [data-motion='icon'] svg * {
+    stroke-width: 1.4;
   }
 
   html[dir='rtl'] .about-page .card-label,
@@ -562,26 +1218,33 @@
     left: 24px;
     top: 336px;
     font-size: 104px;
-    color: rgba(255, 255, 255, 0.075);
+    color: rgba(255, 255, 255, 0.055);
   }
 
   /* Label recedes, title carries, the tick under it gains a little length —
      three clearly separate weights instead of two near-equal ones. */
   html[dir='rtl'] .about-page .card-label {
     top: 40px;
-    font-size: 12px;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 13px;
     font-weight: 700;
+    letter-spacing: 0;
+    color: #D4AF37;
   }
 
   html[dir='rtl'] .about-page .card-title {
     top: 58px;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
     font-size: 30px;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: 0;
+    color: #F0E7F6;
   }
 
   html[dir='rtl'] .about-page .card-tick {
     top: 121px;
     width: 34px;
+    background: #D4AF37;
   }
 
   /* Air between the three tiers: the body drops 10px and opens up, which is
@@ -589,8 +1252,10 @@
   html[dir='rtl'] .about-page .card-body {
     top: 152px;
     width: 268px;
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
     line-height: 1.75;
-    color: rgba(255, 255, 255, 0.84);
+    color: #DDD1E8;
   }
 
   /* The corner mark clears the taller Arabic lower content. */
@@ -609,7 +1274,9 @@
   }
 
   html[dir='rtl'] .about-page .card-services li {
-    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
+    color: #DDD1E8;
   }
 
   html[dir='rtl'] .about-page .card-split {
@@ -622,12 +1289,17 @@
   }
 
   html[dir='rtl'] .about-page .card-languages p {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
     font-weight: 700;
+    letter-spacing: 0;
+    color: #D4AF37;
   }
 
   html[dir='rtl'] .about-page .card-languages ul {
     gap: 16px;
-    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
+    color: #DDD1E8;
   }
 
   /* ── 02 — experience ── */
@@ -635,8 +1307,20 @@
     top: 288px;
   }
 
+  html[dir='rtl'] .about-page .card-stats svg {
+    width: 29px;
+    height: 29px;
+    color: rgba(198, 160, 226, 0.72);
+  }
+
+  html[dir='rtl'] .about-page .card-stats svg * {
+    stroke-width: 1.4;
+  }
+
   html[dir='rtl'] .about-page .card-stats p:last-child {
-    color: rgba(255, 255, 255, 0.66);
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 600;
+    color: #C5B4D4;
   }
 
   /* ── 03 — tools ──
@@ -652,12 +1336,30 @@
   html[dir='rtl'] .about-page .tool-tile {
     width: 68px;
     height: 68px;
+    padding: 5px;
+    border-radius: 16px;
     border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  html[dir='rtl'] .about-page .tool-tile > span {
+    border-radius: 12px;
+    font-size: 24px;
+  }
+
+  /* The serif Canva mark needs the extra body to read at the same weight. */
+  html[dir='rtl'] .about-page .tool-tile > span.font-serif {
+    font-size: 30px;
+  }
+
+  html[dir='rtl'] .about-page .tool-tile svg {
+    width: 18px;
+    height: 27px;
   }
 
   html[dir='rtl'] .about-page .tool-label {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    color: #C5B4D4;
   }
 
   /* ── side rail ──
@@ -672,21 +1374,68 @@
 
   /* ── Arabic /work hero type ────────────────────────────────────────
      The two masked lines are cut to `leading-[0.94]` and already carry a
-     `pb / -mb` pair so descenders clear the `overflow-hidden` box. Arabic
-     needs the same pair at the *top*: its dots and diacritics sit above the
-     line, and at 0.94 leading the half-leading is negative, so the mask edge
-     lands inside them. Padding opens the clip box upward and the matching
-     negative margin puts the line box back on the pixel it was on, so the
-     size, face, position and the `yPercent` reveal are untouched — the line
-     still rises into a mask, that mask just starts higher. */
+     `pb / -mb` pair, sized for Latin descenders. Arabic needs that pair
+     opened on *both* edges: its dots and diacritics sit above the line, and
+     the two dots of a final ي sit well below the baseline — at 0.94 leading
+     the half-leading is negative on both sides, so the `overflow-hidden`
+     mask edge lands inside them and cuts them off. Padding opens the clip
+     box up and down; the matching negative margins put the line box back on
+     the pixel it was on, so the size, position, block height and the
+     `yPercent` reveal are untouched — the line still rises into a mask,
+     that mask is simply taller than the line.
+
+     The eyebrow also rises 22px, and since the two lines are in normal flow
+     the title's own top margin takes those 22px back (13 → 35), so أعمالي
+     stays on the exact pixel it was on and only the label moves. */
   html[dir='rtl'] .work-page .work-title {
     padding-top: 0.18em;
-    margin-top: calc(13px - 0.18em);
+    margin-top: calc(35px - 0.18em);
+    padding-bottom: 0.32em;
+    margin-bottom: -0.32em;
   }
 
   html[dir='rtl'] .work-page .work-eyebrow {
     padding-top: 0.14em;
-    margin-top: -0.14em;
+    margin-top: calc(-0.14em - 22px);
+    padding-bottom: 0.24em;
+    margin-bottom: -0.24em;
+  }
+
+  /* Anton carries no Arabic, so the base layer was dropping the headline to
+     Tahoma — flat stems, no display weight, and a plain white that sat back
+     from the scene. Tajawal 800 is the same non-calligraphic grotesque the
+     Arabic home headline runs on, on a rich lilac, so the word carries the
+     fold. Tracking goes to zero: Arabic is joined, and letter-spacing pulls
+     the joins apart. */
+  html[dir='rtl'] .work-page .work-title {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: 0;
+    color: #d8b7f2;
+  }
+
+  /* Eyebrow: the same family at a label weight, one step larger, on the
+     refined metallic gold rather than the page's straw token — pale yellow
+     at this size against the plum. Tracking dropped for the same reason. */
+  html[dir='rtl'] .work-page .work-eyebrow {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.005em;
+    color: #d4af37;
+  }
+
+  /* Lede: EB Garamond has no Arabic either, so this was Tahoma at 70% white
+     — thin and low-contrast. Tajawal at a text weight, 2px up, on the warm
+     lavender-grey, with the leading opened for Arabic's taller line. The
+     306px measure, the four authored lines and the mirrored position are
+     unchanged. */
+  html[dir='rtl'] .work-page [data-motion='lede'] {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.72;
+    color: #e8dff0;
   }
 
   /* The pale straw reads as washed out under Tahoma's lighter Arabic stems.
@@ -699,7 +1448,97 @@
   }
 
   html[dir='rtl'] .work-page [data-motion='eyebrow-line'] {
+    font-weight: 800;
+  }
+
+  /* ── Arabic case studies ───────────────────────────────────────────
+     One block for all eleven `/ar/work/:slug` pages, scoped to the shared
+     chrome's `.case-study-page`, so nothing is authored per project and the
+     English pages — which never match `[dir='rtl']` — are untouched.
+
+     Anton, Oswald and EB Garamond carry no Arabic, so the base layer was
+     dropping every level of the page to one Tahoma at one weight: the
+     hierarchy came only from size, and the body sat at 65% white on a dark
+     plum, which is where the low contrast came from. Tajawal restores the
+     ladder by weight — 800 for the project title, 700 for headings and
+     labels, 500/600 for reading text — and the colours move off flat white
+     and grey onto a light-lavender / warm-neutral family. Nothing here
+     touches layout, images, order or motion; the Latin display metrics are
+     re-set only where Arabic needs the room (the 0.92 / 1.04 leadings run
+     through Arabic ascenders and dots). */
+  html[dir='rtl'] .case-study-page .home-section .font-display,
+  html[dir='rtl'] .case-study-page .home-section .font-nav,
+  html[dir='rtl'] .case-study-page .home-section .font-serif {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+  }
+
+  /* Project title. Held off pure white so the eyebrow gold and the lilac
+     keep their place above it. */
+  html[dir='rtl'] .case-study-page .home-section h1 {
+    font-weight: 800;
+    line-height: 1.16;
+    color: #f4eef9;
+  }
+
+  /* Section and closing headings. */
+  html[dir='rtl'] .case-study-page .home-section h2 {
     font-weight: 700;
+    line-height: 1.3;
+    color: #efe7f6;
+  }
+
+  /* Reading text: section body, the header intro and the closing paragraphs.
+     Up from 65/70% white to a warm lavender at a text weight, with the
+     leading opened for Arabic's taller line. */
+  html[dir='rtl'] .case-study-page .home-section .font-serif {
+    font-weight: 500;
+    line-height: 1.85;
+    color: #e0d6ea;
+  }
+
+  /* Interface labels — section eyebrows, the facts strip, the note lines,
+     the back link, the outro stamp and the button. Oswald's small tracked
+     caps were doing the work in English; in Arabic the weight does it. */
+  html[dir='rtl'] .case-study-page .home-section .font-nav {
+    font-weight: 600;
+    /* The 30–45% whites — the back link, the plate notes and the outro stamp
+       — were the least readable text on the page. One warm neutral replaces
+       all of them; the two accented label colours are re-asserted below so
+       the eyebrow gold and the section numeral keep their roles, and the
+       button keeps a near-white so the one CTA still leads. */
+    color: #c8b9d8;
+  }
+
+  html[dir='rtl'] .case-study-page .home-section .font-nav.text-beige {
+    color: var(--color-beige);
+  }
+
+  html[dir='rtl'] .case-study-page .home-section .font-nav.text-purple-light {
+    color: var(--color-purple-light);
+  }
+
+  html[dir='rtl'] .case-study-page .home-section .font-nav.text-white {
+    font-weight: 700;
+    color: #f4eef9;
+  }
+
+  /* The facts strip: label above value. The label was 35% white — the
+     weakest text on the page — and the value 80%. */
+  html[dir='rtl'] .case-study-page .home-section dt.font-nav {
+    font-weight: 700;
+    color: #b9a8cc;
+  }
+
+  html[dir='rtl'] .case-study-page .home-section dd.font-nav {
+    font-weight: 500;
+    line-height: 1.7;
+    color: #e6dcee;
+  }
+
+  /* Subtitle under the title, and image captions. */
+  html[dir='rtl'] .case-study-page .home-section figcaption.font-nav {
+    font-weight: 500;
+    color: #bfb0d0;
   }
 }
 
@@ -971,6 +1810,726 @@
     [data-magnetic] {
       will-change: auto;
       transform: none;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Navbar links, Arabic. The base RTL rule sends every `.font-nav` to Tahoma;
+   the bar's main links take Tajawal 700 instead, which is the same
+   non-calligraphic grotesque the rest of the Arabic type uses and reads at
+   the weight and size Oswald 600 gives the English bar. No tracking (Arabic
+   joins), and the line box is opened from `leading-none` so the dots above
+   and below the glyphs stay fully inside it; the active petal is nudged back
+   up by the same amount so the indicator sits where it does in English.
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  html[dir='rtl'] [data-nav-links] .font-nav {
+    font-family: 'Tajawal', Tahoma, Arial, sans-serif;
+    font-weight: 700;
+    font-size: 21px;
+    letter-spacing: 0;
+    line-height: 1.25;
+  }
+
+  html[dir='rtl'] [data-nav-links] .font-nav > span {
+    bottom: -7px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HOMEPAGE — MOBILE (< 1024px)
+
+   Everything below this line is inside one `@media (max-width: 1023.98px)`
+   and scoped to `.home-page`, so the 1440-canvas desktop composition and
+   every other route are untouched by construction. 1023.98 rather than 1023
+   is Tailwind's own `max-lg` edge, which is what `Navbar`'s `max-lg:hidden`
+   and `SelectedWork`'s `matchMedia` both use — the three have to agree or a
+   fractional-zoom width lands between them.
+
+   This is the desktop composition re-set for a single column, not a
+   redesign: the same plum ground, the same bloom over it, the same
+   eyebrow → headline → categories → CTAs → signature order, the same
+   drifting work rows. What changes is that the fold stacks — copy in the
+   upper half, the bloom filling the lower half of the first screen and
+   bleeding off the inline-end edge, the pull quote closing it — and that
+   every size is re-set for the width rather than scaled down from 1440.
+
+   The layer is `utilities` for the same reason the Arabic mirror is: nearly
+   every rule here overrides a Tailwind arbitrary utility written on the same
+   element, and layer order, not specificity, is what decides that.
+   ══════════════════════════════════════════════════════════════════════════ */
+@layer utilities {
+  @media (max-width: 1023.98px) {
+    /* ── canvas tokens ──────────────────────────────────────────────
+       The short-viewport desktop ladder above is all `min-width: 1024px`,
+       so none of it reaches here; these are the phone values of the same
+       variables, which means every element that already reads them —
+       gutters, the fold's own height, the work rows' rhythm — follows with
+       no rule of its own.
+
+       `--page-pt` is 10 rather than 43: the compact bar is 58px tall and
+       fixed, and the 50px spacer `Navbar` leaves in the flow plus this
+       makes 60 — the bar's band, cleared by 2px. */
+    .home-page {
+      --page-zoom: 1;
+      --page-pt: 10px;
+      --page-pb: 44px;
+      --hero-top: 22px;
+      --hero-gap-sub: 20px;
+      --hero-gap-cta: 26px;
+      --work-top: 58px;
+      --work-gap: 14px;
+      --content-pl: clamp(18px, 5.2vw, 26px);
+      --nav-pl: 0px;
+      --track-w: 100%;
+      --tulip-shift: 0px;
+      --hero-lift: 0px;
+      --quote-lift: 0px;
+
+      /* The bloom's box. One variable, because the still and the opening's
+         plate have to stay the same box — the handoff between them is a
+         match dissolve, not a cross-fade. 1.333333 is the artwork's own
+         1448/1086 ratio, which is where the desktop 610 x 813.333 comes
+         from too. */
+      --m-tulip-w: min(98vw, 400px);
+    }
+
+    /* The reference nudge off the shared gutter is 30px of a 1440 canvas.
+       At 390 it is width the copy cannot spare, and all it can do is push
+       the work rows past the right edge. */
+    .home-page .home-column {
+      transform: none;
+    }
+
+    /* ── hero copy ──────────────────────────────────────────────────
+       Re-set for the width rather than scaled: the headline takes a real
+       display size with a tight line box, the supporting rows step down
+       further than the headline does so the hierarchy actually opens up at
+       this measure, and both CTAs grow to a comfortable tap target. */
+    .home-page .home-hero-copy {
+      max-width: 100%;
+    }
+
+    .home-page .home-hero-copy [data-motion="hero-eyebrow"] {
+      font-size: 11px;
+      letter-spacing: 0.34em;
+    }
+
+    .home-page .home-hero-copy h1 {
+      margin-top: 12px;
+      font-size: clamp(38px, 11.2vw, 50px);
+      line-height: 1.04;
+      letter-spacing: 0.005em;
+    }
+
+    .home-page .home-hero-copy [data-motion="hero-subtitle"] {
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 12px;
+      letter-spacing: 0.24em;
+    }
+
+    .home-page .home-hero-copy [data-motion="hero-subtitle"] > span[aria-hidden="true"] {
+      width: 5px;
+      height: 5px;
+    }
+
+    /* The pair wraps rather than shrinking below a tap target: two full-size
+       pills on two rows read better here than one row of small ones. */
+    .home-page .home-hero-copy [data-motion="hero-cta"] {
+      height: 52px;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+    }
+
+    .home-page .home-hero-copy a[data-motion="hero-cta"]:first-of-type {
+      gap: 16px;
+      padding-inline: 22px;
+    }
+
+    .home-page .home-hero-copy a[data-motion="hero-cta"]:last-of-type {
+      gap: 18px;
+      padding-inline: 24px;
+    }
+
+    .home-page .home-hero-copy [data-motion="hero-cta"] > svg {
+      width: 22px;
+    }
+
+    /* The pair's own gap, tightened with the buttons so the two rows the
+       pair wraps onto sit closer than the 30px a single row needed. */
+    .home-page .home-hero-copy > div:has(> [data-motion="hero-cta"]) {
+      gap: 12px;
+    }
+
+    /* ── the pull quote, phone only ─────────────────────────────────
+       `Hero` renders a second `QuoteBlock` under the CTAs (`lg:hidden`);
+       the desktop one in `Home` stays `hidden lg:block`, so exactly one is
+       ever visible. Narrow on purpose: it is a pull quote, and at full
+       measure it would read as body copy. */
+    .home-page .home-hero-quote-mobile {
+      width: min(66vw, 250px);
+    }
+
+    .home-page .home-hero-quote-mobile > span[aria-hidden="true"] {
+      font-size: 30px;
+    }
+
+    .home-page .home-hero-quote-mobile blockquote {
+      margin-top: 16px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .home-page .home-hero-quote-mobile figcaption {
+      margin-top: 16px;
+      font-size: 40px;
+    }
+
+    /* ── the bloom ──────────────────────────────────────────────────
+       Bottom-anchored to the first screen and run off the inline-end edge,
+       so it fills the lower half of the fold under the copy and stays the
+       dominant object without a single line of type sitting on it. The
+       still and the opening's plate take the identical box — they are one
+       object across the dissolve.
+
+       Insets and the box only. GSAP owns `transform` on this element (the
+       entrance, the camera drift, the idle and the pointer spring all sum
+       into it), and nothing here touches that. */
+    .home-page [data-motion="tulip"],
+    .home-page [data-motion="intro-plate"] {
+      right: auto;
+      left: auto;
+      top: auto;
+      inset-inline-end: -26vw;
+      bottom: calc(-0.16 * var(--m-tulip-w));
+      width: var(--m-tulip-w);
+      height: calc(1.333333 * var(--m-tulip-w));
+
+      /* The veil is the fold's own backdrop re-projected into this box, and
+         the Arabic rule above states it in 1440-canvas pixels — a centre at
+         874px is far outside a 400px box, which would resolve the whole box
+         to the gradient's outermost stop and read as a dark plate. Back to
+         the box-relative form (identical to `VEIL` in `HeroTulipMedia`), so
+         the ground under the bloom is the page in both languages. */
+      --tulip-veil: radial-gradient(
+        165% 80% at 30% 27%,
+        #26123a 0%,
+        #150c22 45%,
+        #0c0713 100%
+      );
+    }
+
+    /* The two plus marks are placed off a 1440 track, so at phone width they
+       resolve outside the fold and are simply clipped away. Re-placed into
+       the bloom's own field, on logical insets so Arabic mirrors them with
+       no rule of its own. */
+    .home-page .ar-mark-a,
+    .home-page .ar-mark-b {
+      right: auto;
+      left: auto;
+      font-size: 16px;
+    }
+
+    .home-page .ar-mark-a {
+      inset-inline-start: 7vw;
+      top: calc(0.62 * var(--screen));
+    }
+
+    .home-page .ar-mark-b {
+      inset-inline-end: 9vw;
+      top: calc(0.88 * var(--screen));
+    }
+
+    /* ── Selected Work ──────────────────────────────────────────────
+       The rows keep their loop, their opposite directions, their drag and
+       their arrow. Only the frame changes: the numeral gutter and the
+       arrow have no side margin to hang in at this width, so they move
+       above the panel as one line, and the panel loses the height the
+       smaller cards no longer need. Card widths are scaled in
+       `SelectedWork.tsx`, not here — see `MOBILE_CARD_SCALE` for why. */
+    .home-page #selected-work {
+      max-width: 100%;
+      padding-inline-end: 0;
+    }
+
+    .home-page #selected-work > h2 {
+      font-size: 13px;
+      letter-spacing: 0.26em;
+    }
+
+    .home-page [data-motion="work-row"] {
+      padding-top: 34px;
+    }
+
+    .home-page [data-motion="work-gutter"] {
+      top: 0;
+      right: auto;
+      left: auto;
+      inset-inline-start: 0;
+      width: auto;
+      margin: 0;
+      transform: none;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      text-align: start;
+    }
+
+    .home-page [data-motion="work-gutter"] > p:first-child {
+      font-size: 26px;
+    }
+
+    .home-page [data-motion="work-gutter"] > p:last-child {
+      margin-top: 0;
+      font-size: 9px;
+      line-height: 1.3;
+    }
+
+    /* The arrow moves to the opposite end of the same line the gutter now
+       occupies, and mirrors with the language: it points the way the row is
+       reachable, not at a fixed edge. */
+    .home-page [data-motion="work-row"] > button {
+      top: 4px;
+      left: auto;
+      right: auto;
+      inset-inline-end: 0;
+      margin: 0;
+      transform: none;
+    }
+
+    html[dir="rtl"] .home-page [data-motion="work-row"] > button > svg {
+      transform: scaleX(-1);
+    }
+
+    .home-page [data-motion="work-panel"] {
+      height: 140px;
+      border-radius: 11px;
+    }
+
+    .home-page [data-motion="work-card"] {
+      border-radius: 8px;
+    }
+
+    .home-page [data-motion="work-card"] [data-motion="work-card-title"] {
+      bottom: 13px;
+      left: 14px;
+      max-width: 110px;
+      font-size: 14px;
+    }
+
+    .home-page [data-motion="work-card"] [data-motion="work-card-rule"] {
+      bottom: 7px;
+      left: 14px;
+      width: 26px;
+    }
+
+    /* ── WHAT I DO ──────────────────────────────────────────────────
+       Three columns become three stacked entries. The full-height
+       hairlines that split the columns become the horizontal rule between
+       them — the same divider, turned through 90 degrees, so the section
+       still reads as a set rather than as three unrelated blocks. */
+    .home-page .home-section {
+      max-width: 100%;
+    }
+
+    .home-page .wid-group {
+      left: 0;
+      grid-template-columns: 1fr;
+      gap: 34px;
+    }
+
+    .home-page .wid-group [data-motion="wid-col"] {
+      padding-inline: 0;
+      border-left-width: 0;
+    }
+
+    .home-page .wid-group [data-motion="wid-rule"] {
+      top: -17px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+    }
+
+    .home-page .wid-group [data-motion="wid-mark"] {
+      top: -2px;
+      right: auto;
+      left: auto;
+      inset-inline-end: 0;
+      font-size: 16px;
+    }
+
+    .home-page .wid-group [data-motion="wid-index"] {
+      font-size: 36px;
+    }
+
+    .home-page .wid-group h3 {
+      margin-top: 14px;
+      font-size: 24px;
+    }
+
+    .home-page .wid-group [data-motion="wid-body"] {
+      margin-top: 14px;
+      max-width: 100%;
+      font-size: 15px;
+    }
+
+    html[dir="rtl"] .home-page .wid-group [data-motion="wid-body"] {
+      font-size: 15px;
+    }
+
+    /* ── the belief band ────────────────────────────────────────────
+       The band is authored as one absolutely-positioned composition on a
+       500px stage. At phone width it becomes a flow column, in the reading
+       order the desktop composition already has: eyebrow, rule, statement,
+       note, signature — then the tulip crop, full-bleed under them, which
+       is the same relationship the desktop band holds left-to-right,
+       turned through 90 degrees.
+
+       `order` rather than re-ordering the markup, so every `data-motion`
+       hook, every mask and the pointer parallax on the plane are untouched. */
+    .home-page [data-motion="belief-band"] {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      height: auto;
+    }
+
+    html[dir="rtl"] .home-page [data-motion="belief-band"] {
+      align-items: flex-end;
+    }
+
+    .home-page [data-motion="belief-band"] > p:first-of-type,
+    .home-page [data-motion="belief-band"] > [data-motion="belief-rule"],
+    .home-page [data-motion="belief-band"] > h2,
+    .home-page [data-motion="belief-band"] > [data-motion="belief-note"],
+    .home-page [data-motion="belief-band"] > [data-motion="belief-signature"],
+    .home-page .belief-crop {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto;
+    }
+
+    /* The frame and the two plus marks belong to the desktop stage: the
+       frame outlines a crop that no longer sits in a right-hand third, and
+       the marks mark a gap between columns there is no longer a gap in. */
+    .home-page [data-motion="belief-frame"],
+    .home-page [data-motion="belief-band"] > [data-motion="belief-mark"] {
+      display: none;
+    }
+
+    /* The band's own 196px stage clearance is a 1440 measurement. Matched
+       through the band it holds, so the closing CTA's band — which shares
+       the `.home-section` column — keeps its own 49px. */
+    .home-page .home-section:has(> [data-motion="belief-band"]) {
+      padding-top: 88px;
+    }
+
+    .home-page [data-motion="belief-band"] > p:first-of-type {
+      order: 1;
+      font-size: 12px;
+      line-height: 1.9;
+      letter-spacing: 0.2em;
+    }
+
+    .home-page [data-motion="belief-band"] > [data-motion="belief-rule"] {
+      order: 2;
+      margin-top: 20px;
+      width: 120px;
+    }
+
+    .home-page [data-motion="belief-band"] > h2 {
+      order: 3;
+      margin-top: 26px;
+      font-size: clamp(38px, 11.2vw, 50px);
+      line-height: 0.95;
+    }
+
+    .home-page [data-motion="belief-band"] > h2 [data-motion="belief-dot"] {
+      width: 12px;
+      height: 12px;
+      margin-left: 7px;
+    }
+
+    .home-page [data-motion="belief-band"] > [data-motion="belief-note"] {
+      order: 4;
+      margin-top: 22px;
+      width: min(100%, 340px);
+      font-size: 16px;
+    }
+
+    .home-page [data-motion="belief-band"] > [data-motion="belief-signature"] {
+      order: 5;
+      margin-top: 14px;
+      font-size: 46px;
+    }
+
+    /* Full-bleed: the crop keeps the bleed off the canvas edge it has on
+       desktop, taken on both gutters instead of only the right one. */
+    .home-page .belief-crop {
+      order: 6;
+      align-self: stretch;
+      margin-top: 34px;
+      margin-inline: calc(-1 * var(--content-pl));
+      width: auto;
+      height: clamp(230px, 62vw, 300px);
+    }
+
+    .home-page .belief-crop [data-motion="belief-tulip"] {
+      left: -28%;
+      top: -46%;
+      width: 190%;
+    }
+
+    /* ── the closing CTA ────────────────────────────────────────────
+       Same treatment: the statement, the divider and the pill are placed
+       absolutely on a 1440 stage, and become a column here. The vertical
+       divider is the one part with no phone equivalent — it separates two
+       things that are now stacked — so it goes, and the sparkle with it. */
+    .home-page [data-motion="cta-band"] > div {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    html[dir="rtl"] .home-page [data-motion="cta-band"] > div {
+      align-items: flex-end;
+    }
+
+    .home-page [data-motion="cta-divider"],
+    .home-page [data-motion="cta-sparkle"] {
+      display: none;
+    }
+
+    .home-page [data-motion="cta-band"] > div > h2 {
+      margin-inline: 0;
+      font-size: clamp(30px, 8.6vw, 38px);
+      line-height: 1.02;
+    }
+
+    .home-page [data-motion="cta-button-wrap"] {
+      position: relative;
+      top: auto;
+      right: auto;
+      left: auto;
+      margin-top: 28px;
+      width: 100%;
+    }
+
+    .home-page [data-motion="cta-button"] {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      height: 58px;
+      gap: 20px;
+      padding-inline: 26px;
+      font-size: 17px;
+      letter-spacing: 0.05em;
+    }
+
+    .home-page [data-motion="cta-rule"] {
+      left: var(--content-pl);
+      right: var(--content-pl);
+    }
+
+    .home-page [data-motion="cta-plane"] {
+      left: -34vw;
+      top: -18vw;
+      width: min(62vw, 240px);
+    }
+
+    /* ── the footer ─────────────────────────────────────────────────
+       The nav is absolutely centred between two blocks on desktop; here
+       the three parts stack in their own order, and the links become one
+       wrapping row so they stay one object rather than a list. */
+    .home-page footer [data-motion="footer-band"] > div {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 22px;
+    }
+
+    html[dir="rtl"] .home-page footer [data-motion="footer-band"] > div {
+      align-items: flex-end;
+    }
+
+    .home-page footer [data-motion="footer-band"] > div > div:first-child {
+      gap: 20px;
+    }
+
+    .home-page footer [data-motion="footer-logo"] img {
+      height: 42px;
+    }
+
+    .home-page footer [data-motion="footer-note"] {
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .home-page footer ul {
+      position: relative;
+      left: auto;
+      transform: none;
+      flex-wrap: wrap;
+      gap: 18px 26px;
+    }
+
+    .home-page footer [data-motion="footer-link"] a {
+      font-size: 13px;
+    }
+
+    .home-page footer [data-motion="footer-meta"] {
+      text-align: start;
+      font-size: 12px;
+    }
+  }
+}
+
+/* ── Homepage mobile, Arabic ─────────────────────────────────────────
+   The desktop Arabic fold is a per-layer mirror of a 1440 composition —
+   a 580px copy column right-anchored at a measured distance from a bloom
+   placed on the physical left. None of those measurements mean anything in
+   a single column, so the whole mirror is stood down here and RTL does the
+   work on its own: the copy is full-width and right-aligned, the bloom is
+   already on a logical inset above and so lands on the physical left, and
+   the quote is the same block the English fold gets.
+
+   What is kept is everything the Arabic pass exists for — Tajawal for the
+   display and supporting type, the plum / lilac split on the headline, the
+   gold eyebrow and signature, and the open line boxes that keep the dots
+   and diacritics inside their clips. Those are re-stated at phone sizes
+   rather than inherited, because the desktop rules that carry them are
+   scoped to `.ar-hero-copy` / `.ar-hero-quote` boxes this layout no longer
+   uses in the same way.
+   ──────────────────────────────────────────────────────────────────── */
+@layer utilities {
+  @media (max-width: 1023.98px) {
+    /* The mirror's group offsets: zeroed, so the bloom and the marks resolve
+       purely from the logical insets set above. */
+    html[dir="rtl"] .home-page {
+      --ar-group-x: 0px;
+      --ar-quote-x: 0px;
+    }
+
+    /* Arabic joins: every tracking value the phone pass sets on a label is a
+       Latin small-caps measurement, and the base-layer rule that zeroes
+       tracking for `.font-nav` under RTL sits in `@layer base`, which this
+       layer outranks. So each of them is restated at 0 here rather than left
+       to lose the cascade. The Arabic hero headline keeps its own -0.005em
+       from the desktop rules, which are in this layer and more specific. */
+    html[dir="rtl"] .home-page [data-motion="hero-eyebrow"],
+    html[dir="rtl"] .home-page #selected-work > h2,
+    html[dir="rtl"] .home-page [data-motion="work-gutter"] > p:last-child,
+    html[dir="rtl"] .home-page [data-motion="belief-band"] > p:first-of-type,
+    html[dir="rtl"] .home-page [data-motion="cta-button"],
+    html[dir="rtl"] .home-page footer [data-motion="footer-note"],
+    html[dir="rtl"] .home-page footer [data-motion="footer-meta"],
+    html[dir="rtl"] .home-page footer [data-motion="footer-link"] a {
+      letter-spacing: 0;
+    }
+
+    /* The copy column stops being a measured 580px block held off a bloom
+       that is no longer beside it. */
+    html[dir="rtl"] .home-page .ar-hero-copy {
+      position: static;
+      top: auto;
+      width: auto;
+      max-width: 100%;
+      margin-inline: 0;
+    }
+
+    html[dir="rtl"] .home-page .ar-hero-copy [data-motion="hero-eyebrow"] {
+      font-size: 14px;
+    }
+
+    /* 1.44 is not decoration: the line box IS the entrance's overflow clip,
+       and Tajawal's marks fall below a tighter one. The negative margin that
+       closes the gap between the lines is in `em`, so it follows the smaller
+       size on its own and the block keeps its authored rhythm. */
+    html[dir="rtl"] .home-page .ar-hero-copy h1 {
+      margin-top: 8px;
+      font-size: clamp(34px, 9.8vw, 44px);
+      line-height: 1.44;
+    }
+
+    html[dir="rtl"] .home-page .ar-hero-copy [data-motion="hero-subtitle"] {
+      margin-top: var(--hero-gap-sub);
+      font-size: 14px;
+      line-height: 1.6;
+      letter-spacing: 0;
+    }
+
+    html[dir="rtl"] .home-page .ar-hero-copy [data-motion="hero-cta"] {
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    /* The Arabic pull quote, in the phone block rather than in the desktop
+       pocket: same Tajawal voice, same lilac inside the bloom's field, same
+       gold hand for the signature, on a line height that clears the marks. */
+    html[dir="rtl"] .home-page .home-hero-quote-mobile blockquote {
+      font-family: "Tajawal", Tahoma, Arial, sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1.85;
+      color: #dfc4f7;
+    }
+
+    html[dir="rtl"] .home-page .home-hero-quote-mobile > span[aria-hidden="true"] {
+      color: #c6a2e8;
+    }
+
+    html[dir="rtl"] .home-page .home-hero-quote-mobile figcaption {
+      margin-top: 18px;
+      font-family: "Dancing Script", "Allura", cursive;
+      font-weight: 600;
+      color: #e3b65e;
+    }
+
+    /* Selected Work: the label steps back to the phone size the English one
+       takes; the section's auto margin has nothing left to resolve. */
+    html[dir="rtl"] .home-page #selected-work > h2 {
+      font-size: 13px;
+    }
+
+    /* WHAT I DO and the belief band: their desktop placements are offsets
+       inside compositions that no longer exist here. */
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-band"],
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-band"] > p:first-of-type,
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-rule"],
+    html[dir="rtl"] .home-page .ar-belief h2,
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-note"],
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-signature"] {
+      left: auto;
+      right: auto;
+    }
+
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-note"] {
+      font-size: 16px;
+    }
+
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-label"] {
+      font-size: 13px;
+    }
+
+    html[dir="rtl"] .home-page .ar-belief [data-motion="belief-signature"] {
+      font-size: 44px;
+    }
+
+    /* The closing CTA's four right-hand offsets, likewise. */
+    html[dir="rtl"] .home-page .ar-home-cta h2 {
+      margin-right: 0;
+    }
+
+    html[dir="rtl"] .home-page .ar-home-cta [data-motion="cta-button-wrap"] {
+      right: auto;
+    }
+
+    html[dir="rtl"] .home-page .ar-home-cta [data-motion="cta-rule"] {
+      left: var(--content-pl);
+      right: var(--content-pl);
     }
   }
 }

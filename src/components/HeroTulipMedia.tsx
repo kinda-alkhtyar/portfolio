@@ -29,18 +29,41 @@ const PROMOTE_AFTER = 1200
 const SYNC_LIMIT = 2600
 
 /**
- * Long enough to read as a light change rather than a cut, short enough to
- * land inside the 0.62s the opening gives the fold under its plate.
+ * The still going out as the clip comes in. Long enough to read as a light
+ * change rather than a cut, short enough to land inside the 0.62s the opening
+ * gives the fold under its plate.
  */
-const FADE_MS = 420
+const OPEN_MS = 320
+
+/**
+ * The clip going out as the still comes back, at the end of the opening. Short
+ * on purpose: the two register to within 0.2% of the frame, so there is
+ * nothing to dissolve — this only has to not be a cut.
+ */
+const HANDOFF_MS = 100
+
+/**
+ * Seek tolerance when deciding whether the frame on screen is a settled one.
+ * A browser lands a seek on the nearest keyframe, not on the exact second.
+ */
+const FRAME_EPS = 0.08
+
+/**
+ * How close to the end of the file counts as the final open frame. One frame
+ * at 25fps is 0.04s; this is a few of them, so the handoff happens *on* the
+ * bloom's last motion rather than after the element has finished playing.
+ */
+const END_EPS = 0.12
 
 /**
  * The clip is a rectangle; the hero bloom is not. Three layers dissolve the
- * one into the other, with no edit to the file: a veil, a shape and an edge.
+ * one into the other, with no edit to the file: a backdrop, a shape and an
+ * edge — and the backdrop is under the still as well as under the clip, so
+ * there is exactly one ground in this box and it never changes.
  *
- * **Why a veil at all.** The clip is a studio photograph, so its ground is a
- * plum backdrop rather than a flat black — but it is not *this* plum. Measured
- * against the fold's own colour behind this box (rgb(23,13,37) at its
+ * **Why a backdrop at all.** The clip is a studio photograph, so its ground is
+ * a plum backdrop rather than a flat black — but it is not *this* plum.
+ * Measured against the fold's own colour behind this box (rgb(23,13,37) at its
  * top-left, rgb(26,14,42) at its centre, rgb(12,7,19) at its bottom-right) the
  * ground sits ~10 luma **under** the page. A mask alone can only fade that
  * deficit out; wherever the mask is opaque the deficit is fully present, which
@@ -58,10 +81,14 @@ const FADE_MS = 420
  * That is the whole trick, and it is exact: every pixel darker than the page
  * becomes the page, every pixel brighter than it stays the photograph. The
  * result is the fold's own backdrop plus the flower's light on top of it, so
- * there is nothing left to see an edge of. Blending works here because the
- * veil and the clip are siblings inside this masked group — `heroMotion`'s
- * transform isolates the box from the page, so a blend mode reaching for the
- * *page* would have found nothing, but one reaching for a sibling is fine.
+ * there is nothing left to see an edge of.
+ *
+ * `GLOW` is painted over the veil and under the clip: a single wide, deeply
+ * feathered plum bloom centred on the flower's own mass. It does two things at
+ * once — it lifts the floor the `lighten` blend resolves the clip's darkest
+ * pixels onto, so no part of the photograph can bottom out into black, and it
+ * gives the subject the soft ambient pool a bloom of this size would cast. It
+ * has no edge of its own: it is transparent well inside the box on every side.
  *
  * `SHAPE` then follows the flower — head, stem, both leaves, the base — as a
  * union of five long-feathered ellipses, fitted to the envelope the subject
@@ -80,6 +107,9 @@ const FADE_MS = 420
  */
 const VEIL = 'radial-gradient(165% 80% at 30% 27%, #26123A 0%, #150C22 45%, #0C0713 100%)'
 
+const GLOW =
+  'radial-gradient(64% 46% at 51% 36%, rgba(64,31,96,0.50) 0%, rgba(45,21,70,0.26) 42%, rgba(28,14,44,0.10) 66%, rgba(28,14,44,0) 82%)'
+
 const SHAPE = [
   'radial-gradient(67% 48% at 51% 33%, #000 0%, #000 68%, transparent 100%)',
   'radial-gradient(26% 30% at 48% 56%, #000 0%, #000 68%, transparent 100%)',
@@ -94,7 +124,8 @@ const EDGE = [
 ].join(', ')
 
 /**
- * The home fold's tulip, as live media rather than a still.
+ * The home fold's tulip: `tulip.png` for all of its life except the seconds it
+ * is opening, which are the clip's.
  *
  * This is the hero bloom itself, not a stage in front of it: the element that
  * carries `data-motion="tulip"` *is* this component's root, so `heroMotion`
@@ -110,37 +141,39 @@ const EDGE = [
  * under `--tulip-shift` / `--hero-lift` as before. No layout shift, whether
  * the file arrives early, late or never.
  *
- * **The clip is the only media on screen.** `tulip.png` is mounted, but only
- * as the fallback: it holds the box until the clip is genuinely presenting
- * the frame it was asked for, and the two crossfade — the still out as the
- * clip in, over the same 420ms — so from then on nothing of it is layered
- * under the picture. It comes back, on the same fade, if the file errors or
- * autoplay is refused, and under reduced motion it is all there ever is. The
- * subject registers between the two to within 0.2% of the frame in both axes,
- * so what crosses either way is the light, not the picture, and the fold is
- * never a hole.
+ * **One ground, three states, two crossfades, and that is the whole thing.**
+ * The backdrop — the fold's own colour plus the bloom's glow, masked to the
+ * flower — is painted from the first frame and never moves again, so nothing
+ * about the surface behind the bloom ever changes tone. Over it:
+ *
+ *   1. `tulip.png`, on screen from the first paint, covering the wait;
+ *   2. the clip, faded in over `OPEN_MS` once it is presenting a settled
+ *      frame — the opening motion, and only that;
+ *   3. `tulip.png` again, faded back over `HANDOFF_MS` the moment the clip
+ *      reaches its final open frame, and permanent from there.
+ *
+ * The clip is paused and hidden at the end of that last fade and is never
+ * played, sought, resumed or looped again — the resting hero is the still it
+ * has always been, so there is no held video frame to arrive late or drop. The
+ * subject registers between clip and still to within 0.2% of the frame in both
+ * axes, so what crosses either way is the light, not the picture.
+ *
+ * If the clip cannot be played at all — a file that errors, an autoplay the
+ * browser refuses, reduced motion — nothing happens at all: the still is
+ * already the thing on screen, and it simply stays.
  *
  * **When the cinematic opening is running, this clip shadows it.** The opening
  * plays the same file on its own plate and dissolves that plate away; running
  * the hero's copy on the plate's own `currentTime` means the dissolve crosses
  * two identical frames instead of two different ones, so the opening resolves
  * *into* the live hero with nothing to see swap. Both join the file at
- * `HOLD_FROM` — the fold is now released while the plate is still lighting the
- * flower out of the plum, so this waits on the plate's clock rather than on
- * the fold's. When there is no opening — a return visit, a deep link, a
+ * `HOLD_FROM`. When there is no opening — a return visit, a deep link, a
  * restored scroll position — it simply starts there.
- *
- * It plays once and holds its last frame: after the ground settles the clip is
- * a slow, subtle opening, and a loop would announce itself at the cut. From
- * that held frame on, the bloom is alive on `heroMotion` alone — the idle
- * drift, the breath, the pointer depth and the scroll exit all write to this
- * component's root, exactly as they wrote to the `<img>`. Offscreen, it pauses.
  */
 export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWithoutRef<'div'>) {
   const reduced = useReducedMotion()
   const boxRef = useRef<HTMLDivElement>(null)
   const stillRef = useRef<HTMLDivElement>(null)
-  const stackRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -148,52 +181,127 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
 
     const box = boxRef.current
     const still = stillRef.current
-    const stack = stackRef.current
     const video = videoRef.current
-    if (!box || !still || !stack || !video) return
+    if (!box || !still || !video) return
 
     // React's `muted` attribute is not reliably reflected onto the property,
     // and muted is what makes the autoplay permissible at all.
     video.muted = true
 
     let started = false
-    let finished = false
-    let onScreen = true
     let live = false
+    let handed = false
+    let onScreen = true
+    let io: IntersectionObserver | null = null
     let disarm: (() => void) | null = null
     let ceiling: ReturnType<typeof setTimeout> | null = null
     let promotion: ReturnType<typeof setTimeout> | null = null
     let sync = 0
     let syncUntil = 0
+    let frameWatch = 0
+    let frameRaf = 0
 
-    /**
-     * The clip is only shown once it is presenting the frame we asked for —
-     * and the moment it is, the still goes, so the bloom on screen is the
-     * clip alone rather than the clip over a photograph of itself.
-     */
+    // `requestVideoFrameCallback` is not in every lib target; read it off the
+    // element rather than assuming the DOM typings carry it.
+    const frames = video as unknown as {
+      requestVideoFrameCallback?: (cb: () => void) => number
+      cancelVideoFrameCallback?: (handle: number) => void
+    }
+
+    const stopWatch = () => {
+      const cancel = frames.cancelVideoFrameCallback
+      if (frameWatch && cancel) cancel.call(video, frameWatch)
+      if (frameRaf) cancelAnimationFrame(frameRaf)
+      frameWatch = 0
+      frameRaf = 0
+    }
+
+    /** The clip comes up; the backdrop under it does not move. */
     const reveal = () => {
+      if (live || handed) return
       live = true
-      stack.style.opacity = '1'
+      video.style.opacity = '1'
       still.style.opacity = '0'
     }
 
     /**
-     * ...and the still comes back if the clip cannot be shown: a file that
-     * fails to load or decode, or an autoplay the browser refuses. The fold
-     * is then exactly the hero it has always been.
+     * The final open frame, and the end of the clip's life. The still is
+     * already mounted and decoded — it has been on screen for the whole wait —
+     * so this is a 100ms change of opacity with nothing to load, and the
+     * picture that lands is the one the fold keeps.
      */
-    const fallback = () => {
-      live = false
-      stack.style.opacity = '0'
+    const handoff = () => {
+      if (handed) return
+      handed = true
+      stopWatch()
+
+      still.style.transition = `opacity ${HANDOFF_MS}ms linear`
       still.style.opacity = '1'
+      video.style.transition = `opacity ${HANDOFF_MS}ms linear`
+      video.style.opacity = '0'
+
+      // Nothing may touch the clip again: no resume, no rewind, no error path.
+      io?.disconnect()
+      io = null
+      video.removeEventListener('error', onError)
+
+      const retire = () => {
+        video.pause()
+        video.style.visibility = 'hidden'
+      }
+      // A clip that was never revealed has no fade to wait on — and so no
+      // `transitionend` to hear — so it retires on the spot.
+      if (!live) retire()
+      else video.addEventListener('transitionend', retire, { once: true })
     }
 
+    /**
+     * One watcher, two decisions, both taken on a frame that is actually on
+     * screen: `requestVideoFrameCallback` reports the frame that *was
+     * presented*, so the clip is never revealed on a frame the compositor has
+     * not drawn (that is the black plate) and the handoff lands on the bloom's
+     * last motion rather than after playback has stopped. Where the callback
+     * is missing, an rAF poll on `readyState` says the same thing a frame
+     * later.
+     */
+    const tick = () => {
+      frameWatch = 0
+      frameRaf = 0
+      if (handed) return
+
+      const at = video.currentTime
+      const end = video.duration
+
+      if (!live) {
+        // A settled ground, not merely a decoded frame: the file opens
+        // near-white, so an early frame would arrive as a tone jump.
+        if (video.readyState >= 2 && at >= HOLD_FROM - FRAME_EPS) reveal()
+      } else if (end && at >= end - END_EPS) {
+        handoff()
+        return
+      }
+
+      watch()
+    }
+
+    const watch = () => {
+      if (handed || frameWatch || frameRaf) return
+      const rvfc = frames.requestVideoFrameCallback
+      if (rvfc) frameWatch = rvfc.call(video, tick)
+      else frameRaf = requestAnimationFrame(tick)
+    }
+
+    /**
+     * There is no fallback state to enter. The still is what is on screen
+     * until the clip earns its seconds, so a file that errors or an autoplay
+     * that is refused simply means those seconds never happen.
+     */
     const onError = () => {
-      fallback()
+      stopWatch()
     }
 
     const onEnded = () => {
-      finished = true
+      handoff()
     }
 
     /**
@@ -221,7 +329,7 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
     }
 
     const begin = () => {
-      if (started) return
+      if (started || handed) return
 
       // The fold is released a beat *into* the clip now, so that the headline
       // moves while the flower opens — which means the plate is still lighting
@@ -246,9 +354,6 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
         ceiling = null
       }
 
-      video.addEventListener('seeked', reveal, { once: true })
-      video.addEventListener('playing', reveal, { once: true })
-
       try {
         // `running` is re-read: a frame may have passed since the check above.
         const at = plateTime()
@@ -257,11 +362,14 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
         // Non-fatal: playback starts wherever the buffer allows.
       }
 
+      // Armed after the seek, so the first frame it can accept is already a
+      // settled one.
+      watch()
+
       if (!onScreen) return
       const playing = video.play()
-      // A refusal must not leave a hole, and it cannot: the still is still
-      // mounted and comes straight back on the same fade.
-      if (playing) playing.catch(fallback)
+      // A refusal leaves no hole: the still is what is on screen.
+      if (playing) playing.catch(() => stopWatch())
     }
 
     /** Give the file its own bandwidth once the opening no longer needs it. */
@@ -275,24 +383,20 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
     if (video.readyState >= 1) onMeta()
 
     // Offscreen is not worth a decode. The observer is also what resumes a
-    // clip that was released while the fold was out of view.
-    const io = new IntersectionObserver(
+    // clip that was released while the fold was out of view — and it is gone
+    // the moment the still takes over, so it can never rewind a finished clip.
+    io = new IntersectionObserver(
       (entries) => {
         const entry = entries[entries.length - 1]
-        if (!entry) return
+        if (!entry || handed) return
         onScreen = entry.isIntersecting
         if (!onScreen) {
           video.pause()
           return
         }
-        if (!started || finished) return
+        if (!started || video.ended) return
         const playing = video.play()
-        // Only a clip that has never been on screen falls back: one that is
-        // already live and merely refused a resume simply holds its frame.
-        if (playing)
-          playing.catch(() => {
-            if (!live) fallback()
-          })
+        if (playing) playing.catch(() => {})
       },
       { threshold: 0 },
     )
@@ -315,7 +419,7 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
     }
 
     return () => {
-      io.disconnect()
+      io?.disconnect()
       disarm?.()
       if (sync) cancelAnimationFrame(sync)
       if (ceiling) clearTimeout(ceiling)
@@ -323,8 +427,7 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
       video.removeEventListener('loadedmetadata', onMeta)
       video.removeEventListener('ended', onEnded)
       video.removeEventListener('error', onError)
-      video.removeEventListener('seeked', reveal)
-      video.removeEventListener('playing', reveal)
+      stopWatch()
       video.pause()
     }
   }, [reduced])
@@ -335,30 +438,18 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
 
   return (
     <div ref={boxRef} className={`${className ?? ''} h-[813.333px]`} {...rest}>
-      {/* The fallback, not a base layer: it holds the box until the clip is
-          presenting frames and is faded out the moment it is, so the live
-          hero is the clip on its own. It returns only if the clip cannot be
-          played at all. */}
+      {/* The ground, and the only one: the fold's own colour plus the bloom's
+          glow, cut to the flower by the same two masks the clip wears — the
+          edge cut outside, the shape inside, nested rather than intersected in
+          one layer list so no engine has to agree with any other about
+          `mask-composite`. It is painted from the first frame at full
+          strength, under the still as well as under the clip, and it never
+          changes. There is nothing here that can arrive, brighten or read as
+          a rectangle. */}
       <div
-        ref={stillRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{ opacity: 1, transition: `opacity ${FADE_MS}ms linear` }}
-      >
-        <HeroTulip className="size-full" />
-      </div>
-
-      {/* No plate. Outermost of the three: the edge cut, which is also what
-          fades in — the two masks are nested rather than intersected in one
-          layer list, so the shape is a plain union and no engine has to agree
-          with any other about `mask-composite`. */}
-      <div
-        ref={stackRef}
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
         style={{
-          opacity: 0,
-          transition: `opacity ${FADE_MS}ms linear`,
           maskImage: EDGE,
           WebkitMaskImage: EDGE,
           maskComposite: 'intersect',
@@ -367,13 +458,17 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
       >
         <div
           className="size-full"
-          style={{ maskImage: SHAPE, WebkitMaskImage: SHAPE }}
+          // `isolation` keeps the clip's blend reaching the backdrop and
+          // stopping there, rather than at the page behind this box.
+          style={{ maskImage: SHAPE, WebkitMaskImage: SHAPE, isolation: 'isolate' }}
         >
-          {/* The fold's own backdrop, under the clip, so the clip's ground has
-              something to be replaced *by*. See `VEIL`. */}
+          {/* Glow over veil, both under the clip. See `VEIL` and `GLOW`. */}
           {/* `--tulip-veil` lets a mirrored layout re-project the same backdrop
-              for the box's new x without a second component. See `VEIL`. */}
-          <div className="absolute inset-0" style={{ background: `var(--tulip-veil, ${VEIL})` }} />
+              for the box's new x without a second component. */}
+          <div
+            className="absolute inset-0"
+            style={{ background: `${GLOW}, var(--tulip-veil, ${VEIL})` }}
+          />
 
           <video
             ref={videoRef}
@@ -384,12 +479,33 @@ export default function HeroTulipMedia({ className, ...rest }: ComponentPropsWit
             disablePictureInPicture
             tabIndex={-1}
             className="absolute inset-0 size-full object-cover"
-            // Per channel, the brighter of clip and veil. The flower is
+            // Per channel, the brighter of clip and backdrop. The flower is
             // brighter than the page and survives untouched; its ground is
-            // darker and becomes the page exactly.
-            style={{ mixBlendMode: 'lighten' }}
+            // darker and becomes the page exactly. No plate of its own before
+            // it has a frame — the element's default is black — and painted
+            // from the start at 0.001 rather than 0, so it is layerised,
+            // decoded and blended before the fade rather than at it.
+            style={{
+              mixBlendMode: 'lighten',
+              backgroundColor: 'transparent',
+              opacity: 0.001,
+              transition: `opacity ${OPEN_MS}ms linear`,
+              willChange: 'opacity',
+            }}
           />
         </div>
+      </div>
+
+      {/* The hero's actual picture. On screen from the first paint, out only
+          for the seconds the clip is opening the bloom, and back permanently
+          the moment it reaches its final frame. */}
+      <div
+        ref={stillRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{ opacity: 1, transition: `opacity ${OPEN_MS}ms linear`, willChange: 'opacity' }}
+      >
+        <HeroTulip className="size-full" />
       </div>
     </div>
   )

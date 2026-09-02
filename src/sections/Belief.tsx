@@ -28,7 +28,10 @@ export default function Belief() {
   const sectionRef = useMotionScope<HTMLElement>(beliefMotion)
 
   return (
-    <section ref={sectionRef} className="relative overflow-hidden">
+    <section
+      ref={sectionRef}
+      className={`relative overflow-hidden ${locale === 'ar' ? 'ar-belief' : ''}`}
+    >
       <div className="home-section relative pt-[196px]">
         <div data-motion="belief-band" className="relative h-[500px]">
           {/* thin frame the tulip crop sits inside */}
@@ -39,7 +42,10 @@ export default function Belief() {
           />
 
           {/* tulip: a bloom-scale crop, clipped to the band and run off the right edge */}
-          <div className="absolute right-[calc(-1_*_var(--content-pl))] top-[14px] h-[474px] w-[640px] overflow-hidden">
+          {/* `belief-crop` names the window for the phone layout, which takes
+              the band out of absolute placement and stacks it; nothing on
+              desktop reads the class. */}
+          <div className="belief-crop absolute right-[calc(-1_*_var(--content-pl))] top-[14px] h-[474px] w-[640px] overflow-hidden">
             <div data-motion="belief-plane" className="absolute inset-0">
               <img
                 src={tulip}

@@ -1118,10 +1118,31 @@ Current state only. Update this file as work progresses.
   cut. An `IntersectionObserver` pauses it offscreen and resumes it back.
   `preload="metadata"`, promoted to `auto` at 1.2s — after the plate's own
   0.8s promotion, so the intro's covers keep their bandwidth lead.
+- **The clip is the opening only; `tulip.png` is the hero.** Earlier passes
+  tried to make the video the resting state and each fix moved the problem: a
+  group fade put an arriving ground under the flower (the dark plate), and the
+  held final video frame was what read as late and unstable at the end. The
+  architecture is now three states over one unchanging ground — still, clip,
+  still — with no fallback branch to produce a fourth. The backdrop (veil +
+  `GLOW`, both masked by EDGE/SHAPE, `isolation: isolate`) is painted at full
+  strength from the first frame, under the still as well as the clip, and never
+  changes. `GLOW` is a wide, deeply feathered plum pool on the flower's mass:
+  it lifts the floor `lighten` resolves the clip's darkest pixels onto, so no
+  part of the photograph can bottom out into black, and it has no edge of its
+  own. `tulip.png` is on screen from the first paint (covering the wait),
+  crosses out over 320ms when `requestVideoFrameCallback` reports a presented
+  frame at >= `HOLD_FROM`, and crosses back over **100ms** the moment the clip
+  reaches `duration - 0.12s` — its final open frame — after which the video is
+  paused and `visibility: hidden` permanently. Nothing resumes, rewinds, loops
+  or re-enters; the observer is dropped at the handoff. A file that errors or
+  an autoplay that is refused simply means those seconds never happen: the
+  still is already what is on screen. Position, size, masks, blend and every
+  `heroMotion` channel are unchanged; EN and AR share the component.
 - `Work.tsx` still uses `HeroTulip` directly and is untouched.
-- Not verified by render: no headless browser here. Confirm the 420ms crossfade
-  is invisible under the plate, and that the clip's masked ground does not read
-  as a rectangle in the resting fold.
+- Not verified by render: no headless browser here. Confirm the 320ms opening
+  crossfade is invisible under the plate, that the 100ms handoff at the clip's
+  last frame reads as a stop rather than a swap, and that the backdrop does not
+  read as a rectangle in the resting fold.
 
 ## Home intro + hero polish pass
 - **AQARATI and DR. MOUHAMMAD ABOU SHAHIN are now the field's two subjects**,
@@ -1379,3 +1400,112 @@ Current state only. Update this file as work progresses.
 - This supersedes the "CTA sits on the viewport edge exactly like Home" note
   above: Home's own geometry put the button too far right in practice, so the
   fixed variant deliberately insets it instead.
+- Arabic Home closing region refinement (`.ar-belief` on `Belief`, plus the
+  existing `.ar-home-cta` offsets). The belief band is one absolutely-positioned
+  composition, so the whole scene — frame, tulip crop, eyebrow, rule, marks,
+  statement, note, signature — takes a single `left: -56px` on
+  `[data-motion='belief-band']` rather than eight separate offsets; the CTA
+  group's four right-insets each take the same +56 (109→165, 480→536, 573→629,
+  933→989), so both bands step left as one visual group with every internal gap
+  intact. Relative insets only: GSAP owns `transform` on the plane, marks, note,
+  signature and masked lines. The frame's top border is dropped in Arabic
+  (`border-top-width: 0`); its other edges, box and clip-path entrance stay.
+  Type: the statement runs Tajawal 800 at 1.02 leading (safe — the mask clip is
+  `inset(-34% …)`, wider than the line box), split #8F3FB5 / #B66BE0 with the
+  dot in #D6A947; the note is Tajawal 600 at 20px/1.8 in #D8CCE3; the eyebrow is
+  Tajawal 700 at 17px in #D6A947; the signature keeps its gold as Dancing Script
+  600 in #E3B65E. Band height, section height, every `data-motion` hook, the CTA
+  link behaviour, the footer and the English Home are untouched.
+- Arabic belief band, pass 2. The copy alone takes a further 50px left while
+  the media holds the position the band's `left: -56px` gave it: the eyebrow
+  paragraph and the hairline go to -50, the two marks to 160 / 155, statement
+  and note to 230, signature to 593 — each element's own authored offset less
+  50, so internal spacing is unchanged. The eyebrow is addressed through its
+  `<p>` (`belief-label` is the static masked span inside it) and the marks
+  through `:nth-of-type(2)` / `(3)`, since the rule is the band's first span.
+  Palette: headline #7E2FA3 / #A95BD0, note #D9D0E2, and one two-step metallic
+  gold replacing the yellow — #D4AF37 on the eyebrow and the headline's full
+  stop, #C9A24A on the signature. Type unchanged from pass 1 (Tajawal 800 / 600
+  / 700, Dancing Script 600). No motion, size or structural change.
+- Arabic belief band micro-pass: the copy group's shift goes from 50 to 74px
+  (eyebrow p and rule -74, marks 136 / 131, statement and note 206), media
+  unchanged. The signature takes 583 rather than 569 — the note and the
+  signature share a line, so their gap is horizontal, and the extra 14px opens
+  it from 43 to 57. Colours, fonts, sizes, CTA, footer and all motion unchanged.
+- Arabic belief band micro-pass 2: copy group shift 74 → 96px (eyebrow p and
+  rule -96, marks 114 / 109, statement and note 184); media unchanged. The
+  signature holds 575 — the group's shift less 28 — so its horizontal gap from
+  the note opens 57 → 71. Colours, fonts, sizes, CTA, footer, motion unchanged.
+
+## Home mobile (< 1024px) — EN + AR
+
+Home only. `/work`, `/about`, `/contact` and the case studies have **not**
+had their mobile pass; nothing below is turned on for them.
+
+- One breakpoint for the whole pass: **`max-width: 1023.98px`**, stated in
+  three places that must agree — the CSS media queries, `Navbar`'s
+  `max-lg:hidden` (Tailwind's `max-lg` is `< 64rem`) and `SelectedWork`'s
+  `MOBILE_QUERY` / `introGate`'s `matchMedia`. 1023.98 rather than 1023
+  because a fractional-zoom width would otherwise land between them.
+- Desktop >= 1024px is untouched. Every mobile rule lives in two
+  `@layer utilities { @media (max-width: 1023.98px) { … } }` blocks at the
+  end of `global.css`, scoped to `.home-page`; the short-viewport desktop
+  ladder is all `min-width: 1024px`, so the two never meet.
+- **Canvas tokens**, not new geometry: the phone layout re-states
+  `--page-pt/-pb`, `--hero-top`, `--hero-gap-*`, `--work-top/-gap`,
+  `--content-pl` (`clamp(18px, 5.2vw, 26px)`), `--tulip-shift`,
+  `--hero-lift`, `--quote-lift` and `--page-zoom: 1`, so everything that
+  already reads them follows with no rule of its own.
+- **Navbar.** New `mobile` prop, passed only from `Home`. It renders a
+  compact fixed `<header>` (58px: logo, petal EN/AR switcher, hamburger)
+  and hides the desktop bar under `lg`; the sheet holds the four links and
+  LET'S TALK as its closing action. It is a `<header>`, so `heroMotion`'s
+  `q('header')` gives it the same entrance. Logical insets throughout —
+  Arabic mirrors it with no rule of its own. The desktop bar's markup,
+  anchors and inline styles are unchanged.
+- **Hero.** Stacks: eyebrow → headline → categories → CTAs → pull quote,
+  with the bloom bottom-anchored to the first screen (`--m-tulip-w:
+  min(98vw, 400px)`, `inset-inline-end: -26vw`) filling the lower half and
+  bleeding off the inline-end edge. The still and the opening's plate take
+  the identical box, so their match dissolve survives. `--tulip-veil` is
+  re-stated in the box-relative form: the Arabic desktop value is in
+  1440-canvas pixels and would resolve a 400px box to the gradient's last
+  stop and read as a black plate.
+- **The pull quote** is a second `QuoteBlock` in `Hero`, `lg:hidden`; the
+  desktop one in `Home` stays `hidden lg:block`, so exactly one is visible.
+  Its parts carry the same `data-motion="quote-part"` hooks, so it takes
+  the hero's own stagger with nothing added to `heroMotion`.
+- **The cinematic opening is off below `lg`** (`introGate.eligible`). Its
+  plane field is placed in 1440-canvas pixels and its camera solves against
+  the desktop bloom; skipping it takes the same already-supported path a
+  return visit takes.
+- **Selected Work** keeps the loop, the opposite directions, the drag and
+  the arrow. Card widths are scaled in `SelectedWork.tsx`
+  (`MOBILE_CARD_SCALE = 0.62`), **not** in CSS: `createRowLoop` wraps on a
+  set width it is told and the cards carry width as an inline style, so a
+  media query would tear a gap through the row. `WorkRow` is keyed on the
+  scale so crossing the breakpoint rebuilds the loop. The numeral gutter
+  and the arrow move above the panel as one line; panel height 214 → 140.
+- **WHAT I DO / Belief / closing CTA / footer** are absolutely-positioned
+  1440 stages; each becomes a flow column. Belief and the CTA use flex
+  `order` rather than re-ordered markup, so every `data-motion` hook, mask
+  and pointer parallax is untouched. Belief's frame and plus marks, and the
+  CTA's vertical divider and sparkle, are the parts with no phone
+  equivalent and are the only things removed.
+- **Arabic.** The desktop mirror is a per-layer mirror of a 1440
+  composition, so it is stood down here (`--ar-group-x` / `--ar-quote-x` to
+  0, `.ar-hero-copy` back to full width) and RTL does the work. Kept:
+  Tajawal for display and supporting type, the plum / lilac headline split,
+  the gold eyebrow and signature, and the open line boxes — the headline
+  keeps `line-height: 1.44`, because the line box **is** the entrance's
+  overflow clip and Tajawal's marks fall below a tighter one; the -0.37em
+  that closes the gap is in `em`, so it follows the smaller size.
+- Every Latin tracking value the phone pass sets on a label is restated at
+  `0` under RTL. The base-layer rule that zeroes tracking for `.font-nav`
+  is in `@layer base`, which this layer outranks.
+
+### Needs visual check (Home mobile)
+Not yet opened in a browser at any width. Worth eyeballing at 360 / 390 /
+430: the bloom's top edge against the CTA pair (they are close by design,
+and the copy block's height moves with the language), the Arabic headline's
+diacritics inside their clips, and the work rows' first paint.

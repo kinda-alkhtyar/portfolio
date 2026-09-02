@@ -109,7 +109,10 @@ export function CaseStudyChrome({
   ...rest
 }: { children: ReactNode } & ComponentProps<'main'>) {
   return (
-    <main className="home-canvas relative min-w-[1180px] overflow-hidden bg-bg" {...rest}>
+    // `case-study-page` carries no styling of its own in English; it is the
+    // hook the Arabic case-study type rules are scoped to, so every project
+    // page reads in one voice without per-page CSS.
+    <main className="case-study-page home-canvas relative min-w-[1180px] overflow-hidden bg-bg" {...rest}>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 top-0 h-[var(--screen)]"

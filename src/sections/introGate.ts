@@ -42,6 +42,13 @@ function eligible(): boolean {
   // page, not for an opening.
   if (window.location.hash) return false
   if (window.scrollY > 0) return false
+  // The opening's plane field is authored in 1440-canvas pixels — five plates
+  // placed by absolute `left` / `top` — and its camera solves against the
+  // desktop hero bloom. There is no phone-width composition for it, and it
+  // also costs an 8.7MB clip on a phone connection before anything is
+  // readable. Below `lg` the fold is entered directly, which is the same,
+  // already-supported path a return visit takes.
+  if (window.matchMedia('(max-width: 1023.98px)').matches) return false
   return true
 }
 

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import WorkCard from '../components/WorkCard'
 import { projects } from '../data/projects'
@@ -15,6 +15,42 @@ const ROW_TWO_WIDTHS = [256, 246, 234, 216, 320]
 
 /** Gap between cards, in px. Must match the `gap-[8px]` on the track. */
 const GAP = 8
+
+/**
+ * How much of the reference card the phone layout keeps.
+ *
+ * The widths have to shrink in JS rather than in CSS: `createRowLoop` wraps on
+ * a set width it is *told*, and the cards carry their width as an inline
+ * style, so a media query that resized the cards would leave the loop wrapping
+ * on the desktop period and tear a gap through the row. Scaling here keeps the
+ * two in agreement by construction. The gap is deliberately left at 8, which
+ * is the one number the CSS also states.
+ */
+const MOBILE_CARD_SCALE = 0.62
+
+/** The breakpoint the whole Home mobile pass shares with `global.css`. */
+const MOBILE_QUERY = '(max-width: 1023.98px)'
+
+/**
+ * Phone layout as *state*, not as a media query — see `MOBILE_CARD_SCALE` for
+ * why the card widths cannot be handed to CSS. `useReducedMotion` already
+ * establishes this pattern for the same reason.
+ */
+function useMobileLayout(): boolean {
+  const [mobile, setMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches,
+  )
+
+  useEffect(() => {
+    const query = window.matchMedia(MOBILE_QUERY)
+    const onChange = () => setMobile(query.matches)
+    onChange()
+    query.addEventListener('change', onChange)
+    return () => query.removeEventListener('change', onChange)
+  }, [])
+
+  return mobile
+}
 
 /**
  * Copies of the card set laid end to end inside the track.
@@ -77,16 +113,21 @@ function RowArrow({ label, onClick }: { label: string; onClick: () => void }) {
  */
 function WorkRow({
   index,
-  widths,
+  widths: authored,
   from,
   direction,
+  scale,
 }: {
   index: string
   widths: number[]
   from: number
   direction: -1 | 1
+  scale: number
 }) {
   const reduced = useReducedMotion()
+  // Rounded once, here, so the widths the cards are given and the width the
+  // loop wraps on are literally the same numbers.
+  const widths = scale === 1 ? authored : authored.map((width) => Math.round(width * scale))
   const panelRef = useRef<HTMLDivElement>(null)
   const controls = useRef<RowLoopControls>({ nudge: () => {} })
 
@@ -167,6 +208,8 @@ function WorkRow({
  */
 export default function SelectedWork() {
   const t = useT()
+  const mobile = useMobileLayout()
+  const scale = mobile ? MOBILE_CARD_SCALE : 1
   // The block's own arrival, overlapping the hero's tail. The two rows keep
   // their own scopes for the loop; this one only handles the landing.
   const sectionRef = useMotionScope<HTMLElement>(selectedWorkIntro)
@@ -186,8 +229,25 @@ export default function SelectedWork() {
       </h2>
 
       <div className="mt-[var(--work-gap)] flex flex-col gap-[30px]">
-        <WorkRow index="01" widths={ROW_ONE_WIDTHS} from={0} direction={-1} />
-        <WorkRow index="02" widths={ROW_TWO_WIDTHS} from={5} direction={1} />
+        {/* `key` carries the scale on purpose: crossing the breakpoint has to
+            rebuild the loop, because its wrap period was closed over at setup
+            and `useMotionScope` only re-runs on a reduced-motion change. */}
+        <WorkRow
+          key={`01-${scale}`}
+          index="01"
+          widths={ROW_ONE_WIDTHS}
+          from={0}
+          direction={-1}
+          scale={scale}
+        />
+        <WorkRow
+          key={`02-${scale}`}
+          index="02"
+          widths={ROW_TWO_WIDTHS}
+          from={5}
+          direction={1}
+          scale={scale}
+        />
       </div>
     </section>
   )

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import QuoteBlock from '../components/QuoteBlock'
 import { primaryButton, secondaryButton } from '../styles/buttons'
 import { useLocalizedPath, useLocale, useT } from '../i18n/localization'
 
@@ -96,7 +98,7 @@ export default function Hero() {
           </svg>
         </a>
 
-        <a href={path('/about')} data-motion="hero-cta" data-cursor="link" className={secondaryButton}>
+        <Link to={path('/about')} data-motion="hero-cta" data-cursor="link" className={secondaryButton}>
           {t('ABOUT ME')}
           <svg
             viewBox="0 0 22 22"
@@ -107,8 +109,23 @@ export default function Hero() {
             <circle cx="11" cy="7.4" r="4" />
             <path d="M3.8 19.2c0-4 3.2-6.6 7.2-6.6s7.2 2.6 7.2 6.6" strokeLinecap="round" />
           </svg>
-        </a>
+        </Link>
       </div>
+
+      {/* The pull quote, phone widths only.
+
+          On desktop it hangs in the pocket the bloom leaves inside the ring
+          and is placed from `Home` (see `global.css` for the Arabic pocket);
+          at phone width there is no ring and no pocket, so the same block
+          closes the stacked fold instead — the signature still ends the hero,
+          which is the relationship the composition is actually built on.
+
+          Its three parts carry the same `data-motion="quote-part"` hooks the
+          desktop one does, and `heroMotion` collects them with `q(...)`, so it
+          takes the hero's own staggered entrance with nothing added there. The
+          desktop block stays `hidden lg:block`, so exactly one of the two is
+          ever visible. */}
+      <QuoteBlock className="home-hero-quote-mobile mt-[40px] lg:hidden" />
     </section>
   )
 }

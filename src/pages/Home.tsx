@@ -127,10 +127,14 @@ export default function Home() {
 
           {/* ── content ────────────────────────────────────────────── */}
           <div className="home-fill relative z-10 flex flex-col pb-[var(--page-pb)] pt-[var(--page-pt)]">
-            <Navbar variant="fixed" top="var(--page-pt)" />
+            <Navbar variant="fixed" top="var(--page-pt)" mobile />
 
             {/* hero left column: nudged 30px right of the shared content gutter */}
-            <div className="translate-x-[30px] pl-[var(--content-pl)]">
+            {/* `home-column` names this column for the phone layout, which
+                drops the 30px reference nudge — at 390px that nudge is width
+                the copy cannot spare and the only thing it can do is push the
+                work rows past the right edge. Desktop never reads the class. */}
+            <div className="home-column translate-x-[30px] pl-[var(--content-pl)]">
               <div className={ar ? 'ar-hero-copy' : ''}>
                 <Hero />
               </div>

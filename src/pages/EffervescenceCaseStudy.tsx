@@ -12,7 +12,7 @@ export default function EffervescenceCaseStudy({ caseStudy }: { caseStudy: Effer
 
         <div className="mt-[72px]">
           <p className={EYEBROW}><LocalizedText>01 — MOTION STUDY</LocalizedText></p>
-          <div className="mt-[28px] overflow-hidden rounded-[11px] border border-white/12 bg-surface">
+          <div className="mx-auto mt-[28px] aspect-[9/16] w-full max-w-[380px] overflow-hidden rounded-[11px] border border-white/12 bg-surface">
             <video
               src={video}
               autoPlay
@@ -22,7 +22,7 @@ export default function EffervescenceCaseStudy({ caseStudy }: { caseStudy: Effer
               controls
               preload="metadata"
               aria-label="Effervescence commercial soda motion study"
-              className="block aspect-video w-full object-cover"
+              className="block h-full w-full object-cover"
             />
           </div>
         </div>

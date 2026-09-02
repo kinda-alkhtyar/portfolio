@@ -66,10 +66,54 @@ const sectionCopy: Record<string, string[]> = {
   product: ['يُظهر التطبيق المنتج من مسافة الاستخدام الفعلية، مع ترتيب واضح للمعلومات ولمسة زخرفية متوازنة.'],
   home: ['تمنح الشاشة الرئيسية المنتج المساحة الأكبر، وتدعمه بعنوان موجز وتنقل خفيف ودعوات واضحة إلى الإجراء.'],
   contact: ['تحافظ شاشة التواصل على الألوان والبنية الهوائية نفسها، وتجمع الخيارات والنموذج والصورة في تكوين واضح.'],
+  /* FLEURÉ's section is `identity` with the eyebrow "Identity system" — the
+     space, not the hyphen — so neither lookup hit and it fell back to the
+     generic hero copy. Keyed on the id, it now reads as its own section. */
+  identity: ['تظهر الهوية متسقة عبر التغليف والحقائب والبطاقات والمطبوعات والواجهة، من دون أن تنافس المنتج نفسه.', 'يحافظ الخط الذهبي والطباعة الهادئة على الوضوح ويتركان للزهور مركز المشهد.'],
   'identity-system': ['تظهر الهوية متسقة عبر التغليف والحقائب والبطاقات والمطبوعات والواجهة، من دون أن تنافس المنتج نفسه.', 'يحافظ الخط الذهبي والطباعة الهادئة على الوضوح ويتركان للزهور مركز المشهد.'],
 }
 
-const labels: Record<string, string> = { Type: 'النوع', Sector: 'القطاع', Year: 'السنة', Deliverables: 'المخرجات', Role: 'الدور', Scope: 'النطاق', Client: 'العميل' }
+/* Every fact label used by any case study, not only the seven the first pass
+   covered — an unmapped label fell through to English inside an otherwise
+   Arabic strip. */
+const labels: Record<string, string> = {
+  Type: 'النوع', Sector: 'القطاع', Year: 'السنة', Deliverables: 'المخرجات', Role: 'الدور',
+  Scope: 'النطاق', Client: 'العميل', Direction: 'الإدارة الفنية', Discipline: 'المجال',
+  Production: 'الإنتاج', Palette: 'اللوحة اللونية', Applications: 'التطبيقات', Assets: 'الأصول',
+  Format: 'الصيغة', Languages: 'اللغات', Location: 'الموقع', Medium: 'الوسيط',
+  'Pages shown': 'الصفحات المعروضة', Range: 'التشكيلة', Subject: 'الموضوع', Technique: 'الأسلوب',
+}
+
+/* Fact values, translated whole rather than word by word: the old regex pass
+   only caught eight terms, so most of the strip read in English. UI/UX, RTL
+   and the four-digit years stay as written. */
+const factValues: Record<string, string> = {
+  Concept: 'الفكرة والتصور', 'Art Direction': 'إدارة فنية', 'AI Video': 'فيديو بالذكاء الاصطناعي',
+  Motion: 'تصميم حركة', 'Coral, teal, sunshine, lilac, cream': 'مرجاني، تركوازي، أصفر مشمس، ليلكي، كريمي',
+  'Blush, rose, clay, gold': 'وردي فاتح، وردي، طيني، ذهبي',
+  'Brand identity': 'هوية بصرية', 'Brand identity + packaging': 'هوية بصرية + تغليف',
+  'Brand identity + digital product': 'هوية بصرية + منتج رقمي',
+  'Conceptual poster': 'ملصق مفاهيمي', 'Illustrated city poster': 'ملصق مدينة مرسوم',
+  'Product design / web platform': 'تصميم منتج / منصة ويب', 'Website design': 'تصميم موقع إلكتروني',
+  'Website interface': 'واجهة موقع إلكتروني',
+  'Architecture / material reuse': 'العمارة وإعادة استخدام المواد',
+  'Food and beverage / retail': 'الأغذية والمشروبات والتجزئة',
+  'Beauty and permanent makeup': 'الجمال والمكياج الدائم', 'Beauty and skincare': 'الجمال والعناية بالبشرة',
+  'Dental clinic': 'عيادة أسنان', 'Floral boutique': 'متجر زهور', 'Real estate': 'العقارات',
+  'Vienna, Austria': 'فيينا، النمسا', 'Damascus, the city of jasmine': 'دمشق، مدينة الياسمين',
+  'Arabic, English, Turkish, German': 'العربية، الإنجليزية، التركية، الألمانية',
+  'Desktop screens': 'شاشات مكتبية', 'Portrait, print resolution': 'عمودي، بدقة طباعة',
+  'Home + contact': 'الرئيسية + التواصل', 'One poster': 'ملصق واحد',
+  'One identity montage': 'لوحة هوية واحدة', 'Two interface screens': 'شاشتا واجهة',
+  'Pencil and crosshatch illustration': 'رسم بالقلم الرصاص والتظليل المتقاطع',
+  'Stained glass illustration': 'رسم بأسلوب الزجاج الملوّن',
+  'Gentle Cleanser, Glow Serum, Facial Oil': 'غسول لطيف، سيروم الإشراق، زيت البشرة',
+  'Packaging, ribbon, tags, vehicle, storefront': 'التغليف، الشريط، البطاقات، السيارة، واجهة المتجر',
+  'Logo system, packaging, label system, gift box': 'نظام الشعار، التغليف، نظام الملصقات، علبة الهدية',
+  'Logo system, salon signage, packaging, retail and stationery': 'نظام الشعار، لافتات الصالون، التغليف، التجزئة والمطبوعات',
+  'Five-page site, interaction design, appointment flow': 'موقع من خمس صفحات، تصميم التفاعل، مسار حجز المواعيد',
+  'UI system, RTL layout, search and map discovery, account flows': 'نظام واجهة، تخطيط RTL، البحث والاستكشاف عبر الخريطة، مسارات الحسابات',
+}
 
 function localizeSection(section: CaseStudySection): CaseStudySection {
   const copy = sectionCopy[section.id] ?? sectionCopy[section.eyebrow.toLowerCase()] ?? sectionCopy.hero
@@ -78,7 +122,7 @@ function localizeSection(section: CaseStudySection): CaseStudySection {
     eyebrow: eyebrows[section.eyebrow] ?? section.eyebrow,
     title: titles[section.title] ?? section.title,
     body: section.body.map((_, index) => copy[index] ?? copy[copy.length - 1]),
-    images: section.images.map((image) => ({ ...image, caption: image.caption ? 'عرض من تطبيقات المشروع.' : undefined, alt: `عرض بصري من مشروع ${image.file}` })),
+    images: section.images.map((image) => ({ ...image, caption: image.caption ? 'عرض من تطبيقات المشروع.' : undefined, alt: 'عرض بصري من المشروع.' })),
   }
 }
 
@@ -98,6 +142,8 @@ export function localizeCaseStudy(caseStudy: CaseStudy): CaseStudy {
 }
 
 function translateFact(value: string) {
+  const whole = factValues[value]
+  if (whole) return whole
   return value
     .replace(/Brand identity/gi, 'هوية بصرية').replace(/Graphic design/gi, 'تصميم جرافيكي')
     .replace(/UI\/UX design/gi, 'تصميم UI/UX').replace(/Web platform/gi, 'منصة ويب')

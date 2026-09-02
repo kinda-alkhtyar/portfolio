@@ -62,6 +62,27 @@ function TulipIcon() {
   )
 }
 
+/* Arabic card headers use one family of thin geometric line marks, drawn on
+   the same 24 grid at the same 1.5 stroke as the rest of the set. */
+function SparklesIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[26px] text-purple-light" aria-hidden="true">
+      <path {...stroke} d="M12 3.2l1.7 4.7 4.7 1.7-4.7 1.7-1.7 4.7-1.7-4.7-4.7-1.7 4.7-1.7z" />
+      <path {...stroke} d="M18 15.4l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7zM5.6 4.2v3M4.1 5.7h3" />
+    </svg>
+  )
+}
+
+function PenToolIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[26px] text-purple-light" aria-hidden="true">
+      <path {...stroke} d="M12 2.9l6.5 4.4 2.3 7.7-8.8 6-8.8-6 2.3-7.7z" />
+      <path {...stroke} d="M12 2.9v7.3M6.6 13.9l4.1-3M17.4 13.9l-4.1-3" />
+      <circle {...stroke} cx="12" cy="11.9" r="1.7" />
+    </svg>
+  )
+}
+
 function CalendarIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-[26px] text-white/70" aria-hidden="true">
@@ -330,12 +351,12 @@ export default function About() {
         </section>
 
         {/* ── card band ────────────────────────────────────────────── */}
-        <section className="flex gap-[20px] px-[84px]">
+        <section className="about-cards flex gap-[20px] px-[84px]">
           <Card
             label={locale === 'ar' ? 'الخبرات' : 'EXPERTISE'}
             title={locale === 'ar' ? 'ماذا أقدّم' : 'WHAT I DO'}
             numeral="01"
-            icon={<StarIcon />}
+            icon={locale === 'ar' ? <SparklesIcon /> : <StarIcon />}
             body={locale === 'ar' ? 'أبني هويات وتجارب بصرية تجمع بين الفكرة، الوضوح، والتأثير.' : 'I work across a range of visual disciplines to help brands and products communicate clearly and beautifully.'}
           >
             <ul
@@ -392,7 +413,7 @@ export default function About() {
             label={locale === 'ar' ? 'الأدوات' : 'TOOLS'}
             title={locale === 'ar' ? 'أدواتي' : 'WHAT I USE'}
             numeral="03"
-            icon={<TulipIcon />}
+            icon={locale === 'ar' ? <PenToolIcon /> : <TulipIcon />}
             body={locale === 'ar' ? 'أستخدم الأدوات كوسيلة لتنفيذ الفكرة بدقة — من الهوية وحتى التجربة الرقمية.' : 'I use industry-standard tools to bring ideas to life from concept to final design.'}
           >
             <div data-motion="card-part" className="card-tools absolute left-[32px] top-[258px] flex gap-[27px]">
