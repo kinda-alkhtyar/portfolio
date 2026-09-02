@@ -273,7 +273,6 @@ const BLOOM_REACH = 0.52
 const BLOOM_REMEASURE = 250
 
 export function heroMotion({ scope, q }: { scope: HTMLElement; q: (selector: string) => HTMLElement[] }) {
-  const nav = q('header')
   const scene = q('[data-motion="hero-scene"]')
   const text = q('[data-motion="hero-text"]')
   const eyebrow = q('[data-motion="hero-eyebrow"]')
@@ -300,7 +299,6 @@ export function heroMotion({ scope, q }: { scope: HTMLElement; q: (selector: str
     el.style.perspectiveOrigin = rtl ? SCENE.originRtl : SCENE.origin
   })
 
-  gsap.set(nav, { autoAlpha: 0, y: -12 })
   gsap.set(eyebrow, { autoAlpha: 0, y: 16 })
   // The origin sits on the gutter the lines are set against — left in English,
   // right in Arabic — so the lines grow away from it and arriving from depth
@@ -338,8 +336,7 @@ export function heroMotion({ scope, q }: { scope: HTMLElement; q: (selector: str
     defaults: { ease: ROLE.support },
   })
 
-  tl.to(nav, { autoAlpha: 1, y: 0, duration: DUR.slow }, BEAT.open)
-    .to(eyebrow, { autoAlpha: 1, y: 0, duration: DUR.slow }, BEAT.lead)
+  tl.to(eyebrow, { autoAlpha: 1, y: 0, duration: DUR.slow }, BEAT.lead)
     // The headline is the anchor: slowest ease, longest travel, led by a
     // stagger small enough that the three lines still read as one block. Each
     // line closes its own z, so they settle onto the same plane from three
