@@ -74,8 +74,8 @@ export default function Hero() {
       </p>
 
       <div className="mt-[var(--hero-gap-cta)] flex flex-wrap items-center gap-[30px]">
-        <a
-          href="#selected-work"
+        <Link
+          to={path('/work')}
           data-motion="hero-cta"
           data-cursor="button"
           className={primaryButton}
@@ -96,7 +96,7 @@ export default function Hero() {
               strokeLinejoin="round"
             />
           </svg>
-        </a>
+        </Link>
 
         <Link to={path('/about')} data-motion="hero-cta" data-cursor="link" className={secondaryButton}>
           {t('ABOUT ME')}

@@ -163,7 +163,10 @@ export default function Navbar({
   )
 
   const bar = (
-    <header className="flex h-[50px] items-center justify-end pl-[var(--nav-pl)] pr-[23px]">
+    <header
+      data-cursor-exclude
+      className="flex h-[50px] items-center justify-end pl-[var(--nav-pl)] pr-[23px]"
+    >
       {variant === 'flow' && <div className="me-auto ms-[30px]">{brand}</div>}
 
       <nav className="flex items-center gap-[47px]">
@@ -200,6 +203,7 @@ export default function Navbar({
      so Arabic mirrors it with no rule of its own. */
   const mobileBar = (
     <header
+      data-cursor-exclude
       className="fixed inset-x-0 top-0 lg:hidden"
       style={{ zIndex: Z.nav }}
       data-mobile-nav={menuOpen ? 'open' : 'closed'}
@@ -341,6 +345,7 @@ export default function Navbar({
           bar, so at rest it lands on the same pixel as the flow version. Sits
           on the `nav` rung: above every page layer, below the route wipe. */}
       <div
+        data-cursor-exclude
         className={`fixed inset-x-0 top-0 ${mobile ? 'max-lg:hidden' : ''}`}
         style={{ zIndex: Z.nav, paddingTop: top }}
       >
@@ -363,7 +368,15 @@ export default function Navbar({
             inset — far left in English, mirrored to the far right in Arabic —
             independent of the bar's own track, padding and nav spacing. `top`
             matches the shell's padding so it shares the bar's 50px band. */}
-        <div className="absolute -translate-y-[15px]" style={{ top, insetInlineStart: 30 }}>
+        {/* `zIndex: 2` for the same reason the switcher below carries it: the
+            bar row is painted on rung 1, and its `<header>` box spans the full
+            width of the bar even though only LET'S TALK sits in it on this
+            variant. Without a rung of their own, the anchored logo and the
+            centred link group paint — and hit-test — *under* that empty box. */}
+        <div
+          className="absolute -translate-y-[15px]"
+          style={{ top, insetInlineStart: 30, zIndex: 2 }}
+        >
           {brand}
         </div>
 
@@ -372,7 +385,7 @@ export default function Navbar({
             optical centre is identical in English and Arabic. */}
         <div
           className="absolute left-1/2 flex h-[50px] -translate-x-1/2 -translate-y-[18px] items-center"
-          style={{ top }}
+          style={{ top, zIndex: 2 }}
         >
           {navList}
         </div>

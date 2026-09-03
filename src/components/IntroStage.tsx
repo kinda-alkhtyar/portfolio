@@ -44,7 +44,12 @@ export default function IntroStage({ ref }: { ref?: Ref<HTMLDivElement> }) {
       // JS owns the reveal. If it never runs the opening is skipped rather
       // than left covering the page.
       style={{ opacity: 0, visibility: 'hidden' }}
-      className="fixed inset-0 z-40 overflow-hidden"
+      // Decorative from the first paint: the stage sits a rung above the nav
+      // (z 40 vs 30) and spans the viewport, so while the opening runs it
+      // would otherwise be the hit-test target over the bar — the links would
+      // not even show a pointer until the timeline handed the layer back.
+      // Only SKIP takes events back.
+      className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
     >
       {/* ── the ground: the fold's own backdrop ──────────────────── */}
       <div data-intro="ground" className="absolute inset-0">
@@ -115,7 +120,7 @@ export default function IntroStage({ ref }: { ref?: Ref<HTMLDivElement> }) {
         type="button"
         data-intro="skip"
         data-cursor="link"
-        className="absolute bottom-[46px] right-[52px] font-nav text-[11px] font-medium leading-none tracking-[0.42em] text-white/40 transition-colors duration-300 hover:text-white/75 focus-visible:text-white/75"
+        className="pointer-events-auto absolute bottom-[46px] right-[52px] font-nav text-[11px] font-medium leading-none tracking-[0.42em] text-white/40 transition-colors duration-300 hover:text-white/75 focus-visible:text-white/75"
       >
         SKIP
       </button>

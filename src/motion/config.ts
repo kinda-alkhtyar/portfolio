@@ -101,10 +101,6 @@ export const HOVER = { duration: DUR.base, ease: EASE.expo } as const
  * is the entire effect, so the two are named rather than derived.
  */
 export const CURSOR = {
-  /** Dot follow. Short enough to read as the pointer itself. */
-  dot: 0.16,
-  /** Ring follow. Roughly 4x the dot, which is where the lag reads as weight. */
-  ring: 0.62,
   /** State swaps (hover / view / hidden). */
   state: DUR.swap,
   /** Zone fades, asymmetric: arriving is announced, leaving is not. */

@@ -59,8 +59,9 @@ const STATES: Record<CursorState, { ring: number; dot: number; alpha: number; pu
 /**
  * The site cursor.
  *
- * A dot that tracks the pointer closely and a ring that lags behind it — the
- * lag is the whole effect. Mounted once at the app root; it renders nothing at
+ * A dot and a ring, both locked to the pointer with no follow delay — only
+ * the ring's scale, colour and label react to what is under the pointer.
+ * Mounted once at the app root; it renders nothing at
  * all on coarse pointers or under reduced motion, so touch devices and
  * motion-sensitive visitors pay no cost.
  *
@@ -69,6 +70,10 @@ const STATES: Record<CursorState, { ring: number; dot: number; alpha: number; pu
  * custom cursor is a commitment on every page; a zone lets one composition
  * (currently the Home hero fold) carry it without imposing it on reading
  * sections, forms or the case-study pages.
+ *
+ * A subtree marked `data-cursor-exclude` opts out even inside a zone: the
+ * cursor is cut immediately and the native arrow takes over. That is how the
+ * navbar, which is fixed over the Home hero's zone, keeps a plain pointer.
  *
  * Inside a zone, elements refine the state declaratively:
  *
@@ -100,10 +105,18 @@ export default function CustomCursor() {
       }
 
       const ctx = gsap.context(() => {
-        const dotX = gsap.quickTo(dot, 'x', { duration: CURSOR.dot, ease: EASE.expo })
-        const dotY = gsap.quickTo(dot, 'y', { duration: CURSOR.dot, ease: EASE.expo })
-        const ringX = gsap.quickTo(ring, 'x', { duration: CURSOR.ring, ease: EASE.expo })
-        const ringY = gsap.quickTo(ring, 'y', { duration: CURSOR.ring, ease: EASE.expo })
+        // Centred on the pointer by the element's own half-size, so tracking
+        // only ever writes raw client coordinates.
+        gsap.set([dot, ring], { xPercent: -50, yPercent: -50 })
+
+        // Direct setters, no tween: X/Y land on the same frame as the pointer
+        // event, so the cursor cannot trail the real one. Scale, colour and
+        // label still tween — they are written by separate tweens, so they
+        // never hold up movement.
+        const dotX = gsap.quickSetter(dot, 'x', 'px')
+        const dotY = gsap.quickSetter(dot, 'y', 'px')
+        const ringX = gsap.quickSetter(ring, 'x', 'px')
+        const ringY = gsap.quickSetter(ring, 'y', 'px')
 
         let placed = false
         let inZone = false
@@ -119,9 +132,17 @@ export default function CustomCursor() {
 
         // Asymmetric on purpose: arriving in a zone is announced, leaving it
         // is not — a slow fade-out reads as the cursor being reluctant to go.
-        const setZone = (next: boolean) => {
+        // `immediate` is how an excluded region (the navbar) opts out: it cuts
+        // the cursor rather than fading it, so the bar is never under a
+        // lingering ring.
+        const setZone = (next: boolean, immediate = false) => {
           if (next === inZone) return
           inZone = next
+          if (immediate) {
+            gsap.killTweensOf(root)
+            gsap.set(root, { autoAlpha: next ? 1 : 0 })
+            return
+          }
           gsap.to(root, {
             autoAlpha: next ? 1 : 0,
             duration: next ? CURSOR.zoneIn : CURSOR.zoneOut,
@@ -197,6 +218,16 @@ export default function CustomCursor() {
           place(event)
 
           const target = event.target as Element | null
+
+          // An excluded region wins over any zone it sits inside: the navbar
+          // is fixed over the hero's zone, and there the native arrow is what
+          // keeps the links readable and instantly clickable.
+          if (target?.closest?.('[data-cursor-exclude]')) {
+            setZone(false, true)
+            apply('default', '')
+            return
+          }
+
           setZone(Boolean(target?.closest?.('[data-cursor-zone]')))
 
           const interactive = target?.closest?.<HTMLElement>(
@@ -262,7 +293,7 @@ export default function CustomCursor() {
     >
       <div
         ref={ringRef}
-        className="absolute -left-[19px] -top-[19px] grid size-[38px] place-items-center rounded-full border border-purple-light/60 bg-purple-light/5 will-change-transform"
+        className="absolute left-0 top-0 grid size-[38px] place-items-center rounded-full border border-purple-light/60 bg-purple-light/5 will-change-transform"
       >
         <span
           ref={labelRef}
@@ -272,7 +303,7 @@ export default function CustomCursor() {
 
       <span
         ref={dotRef}
-        className="absolute -left-[3px] -top-[3px] size-[6px] rounded-full bg-purple-light will-change-transform"
+        className="absolute left-0 top-0 size-[6px] rounded-full bg-purple-light will-change-transform"
       />
     </div>
   )
