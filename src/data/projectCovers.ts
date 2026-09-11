@@ -1,4 +1,6 @@
 import aqaratiCover from '../assets/projects/aqarati/home-ar.png'
+import veilInMotionVideo from '../assets/projects/veil-in-motion/veil-in-motion-ai-commercial.mp4'
+import taaniqiCover from '../assets/projects/taaniqi/taaniqi-homepage.png'
 import damascusCover from '../assets/projects/damascus/damascus-poster-cover.jpeg'
 import drAbouShahinCover from '../assets/projects/dr-mouhammad-abou-shahin/cover.png'
 import fleureCover from '../assets/projects/fleure/cover.png'
@@ -11,6 +13,8 @@ import wahjCover from '../assets/projects/wahj/cover.png'
 import effervescenceVideo from '../assets/videos/commercial-motion-soda.mp4'
 
 export type ProjectSlug =
+  | 'veil-in-motion'
+  | 'taaniqi'
   | 'effervescence'
   | 'aqarati'
   | 'second-life'
@@ -29,6 +33,8 @@ export type ProjectSlug =
  * (`workProjects.ts`) read from here, so a cover swap is a one-line edit.
  */
 export const projectCovers: Record<ProjectSlug, string> = {
+  'veil-in-motion': veilInMotionVideo,
+  taaniqi: taaniqiCover,
   effervescence: effervescenceVideo,
   aqarati: aqaratiCover,
   'second-life': secondLifeCover,

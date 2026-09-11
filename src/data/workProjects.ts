@@ -3,6 +3,7 @@ import { projectCovers } from './projectCovers'
 
 export interface WorkProject {
   title: string
+  categoryLabel?: string
   /**
    * Route slug for `/work/:slug`. Set only where a case study page actually
    * exists, so a project without one stays non-clickable in the grid instead
@@ -42,22 +43,14 @@ export const workProjects: WorkProject[] = [
     position: 'center center',
   },
   {
-    title: 'FLEURÉ',
-    slug: 'fleure',
-    category: 'BRANDING',
+    title: 'TAANIQI WITH IMAN',
+    slug: 'taaniqi',
+    category: 'UI/UX DESIGN',
+    categoryLabel: 'Fashion E-commerce / Web Design & Development',
     year: 2026,
-    description: 'Luxury floral boutique identity across\npackaging and branded touchpoints.',
-    cover: projectCovers.fleure,
-    position: 'center 30%',
-  },
-  {
-    title: 'STILL HUMAN',
-    slug: 'still-human',
-    category: 'GRAPHIC DESIGN',
-    year: 2026,
-    description: 'A conceptual poster about human\nconnection and empathy.',
-    cover: projectCovers['still-human'],
-    position: 'center 42%',
+    description: 'A premium Arabic fashion storefront with\nelegant branding and curated collections.',
+    cover: projectCovers.taaniqi,
+    position: 'center 4%',
   },
   {
     title: 'STRAWBERRY & MILK',
@@ -79,6 +72,45 @@ export const workProjects: WorkProject[] = [
     position: 'center 22%',
   },
   {
+    title: 'AQARATI SYRIA',
+    tier: 'lead',
+    slug: 'aqarati',
+    category: 'UI/UX DESIGN',
+    year: 2026,
+    description: 'A multilingual real estate platform\ndesigned for the Syrian market.',
+    cover: projectCovers.aqarati,
+    position: 'center 40%',
+  },
+  {
+    title: 'VEIL IN MOTION',
+    slug: 'veil-in-motion',
+    category: 'AI VIDEO / MOTION',
+    categoryLabel: 'AI Fashion Commercial',
+    media: 'video',
+    year: 2026,
+    description: 'An AI-generated fashion commercial for a shawl brand, combining cinematic visuals, motion, voice, and storytelling into one complete promotional piece.',
+    cover: projectCovers['veil-in-motion'],
+    position: 'center center',
+  },
+  {
+    title: 'FLEURÉ',
+    slug: 'fleure',
+    category: 'BRANDING',
+    year: 2026,
+    description: 'Luxury floral boutique identity across\npackaging and branded touchpoints.',
+    cover: projectCovers.fleure,
+    position: 'center 30%',
+  },
+  {
+    title: 'STILL HUMAN',
+    slug: 'still-human',
+    category: 'GRAPHIC DESIGN',
+    year: 2026,
+    description: 'A conceptual poster about human\nconnection and empathy.',
+    cover: projectCovers['still-human'],
+    position: 'center 42%',
+  },
+  {
     title: 'WAHJ',
     slug: 'wahj',
     category: 'BRANDING',
@@ -96,16 +128,6 @@ export const workProjects: WorkProject[] = [
     description: 'Brand identity and digital material\nlibrary for reclaimed architecture.',
     cover: projectCovers['second-life'],
     position: 'center 28%',
-  },
-  {
-    title: 'AQARATI SYRIA',
-    tier: 'lead',
-    slug: 'aqarati',
-    category: 'UI/UX DESIGN',
-    year: 2026,
-    description: 'A multilingual real estate platform\ndesigned for the Syrian market.',
-    cover: projectCovers.aqarati,
-    position: 'center 40%',
   },
   {
     title: 'SWIRLÉ',

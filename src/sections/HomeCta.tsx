@@ -76,7 +76,7 @@ export default function HomeCta() {
 
           <div data-motion="cta-button-wrap" className="absolute left-[733px] top-[21px]">
             <a
-              href="https://wa.me/905513403448?text=Hi%20Yumna%2C%20I%20came%20across%20your%20portfolio%20and%20I%E2%80%99d%20like%20to%20discuss%20a%20project%20with%20you"
+              href="https://wa.me/905513403447?text=Hi%20Yumna%2C%20I%20came%20across%20your%20portfolio%20and%20I%E2%80%99d%20like%20to%20discuss%20a%20project%20with%20you"
               target="_blank"
               rel="noreferrer"
               data-motion="cta-button"

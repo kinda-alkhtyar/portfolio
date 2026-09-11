@@ -1,4 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
+import VeilInMotionCaseStudy from './VeilInMotionCaseStudy'
+import TaaniqiCaseStudy from './TaaniqiCaseStudy'
 
 import { aqaratiCaseStudy } from '../data/aqaratiCaseStudy'
 import { damascusCaseStudy } from '../data/damascusCaseStudy'
@@ -38,6 +40,8 @@ export default function Project() {
 
   if (slug === 'effervescence')
     return <EffervescenceCaseStudy caseStudy={localized(effervescenceCaseStudy)} />
+  if (slug === 'taaniqi') return <TaaniqiCaseStudy />
+  if (slug === 'veil-in-motion') return <VeilInMotionCaseStudy />
   if (slug === 'second-life') return <CaseStudy caseStudy={localized(secondLifeCaseStudy)} />
   if (slug === 'aqarati') return <AqaratiCaseStudy caseStudy={localized(aqaratiCaseStudy)} />
   if (slug === 'dr-mouhammad-abou-shahin')

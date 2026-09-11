@@ -1,0 +1,176 @@
+/* Phone overrides only. Unlayered so both the desktop utilities and their
+   Arabic mirrors yield to the same phone geometry without specificity races. */
+@media (max-width: 767.98px) {
+  :root { --mobile-gutter: clamp(18px, 4.65vw, 20px); }
+  main:is(.home-page, .work-page, .about-page, .contact-page, .case-study-page) {
+    --content-pl: var(--mobile-gutter);
+    --page-zoom: 1;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    zoom: 1;
+  }
+  :is(.work-page, .about-page, .contact-page, .case-study-page) :is(p, h1, h2, h3, a, dd) {
+    overflow-wrap: anywhere;
+  }
+  :is(.work-page, .about-page, .contact-page, .case-study-page) :is(.grid, .flex) > * { min-width: 0; }
+  [data-mobile-nav] > .relative { padding-inline: var(--mobile-gutter); }
+  #mobile-menu { max-height: calc(100svh - 58px); overflow-y: auto; overscroll-behavior: contain; }
+  #mobile-menu.inert, #mobile-menu[inert] { max-height: 0; }
+  #mobile-menu > :is(ul, div) { padding-inline: 0; }
+
+  /* Shared footer: content and navigation remain in document flow. */
+  [data-motion='footer-band'] > div {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+  [data-motion='footer-band'] > div > div { gap: 18px; flex-wrap: wrap; }
+  [data-motion='footer-band'] ul {
+    position: static;
+    transform: none;
+    translate: none;
+    flex-wrap: wrap;
+    gap: 18px 24px;
+  }
+  [data-motion='footer-band'] :is(p, a) { font-size: 13px; text-align: start; }
+  [data-motion='footer-logo'] img { height: 42px; width: auto; }
+  .case-study-page [data-motion='footer-logo'] img { height: 42px; width: auto; }
+  html[dir='rtl'] .home-page footer [data-motion='footer-band'] > div { align-items: stretch; }
+
+  /* Preserve Home's established mobile composition with one shared gutter. */
+  .home-page .home-column { translate: none; transform: none; padding-inline: var(--mobile-gutter); }
+  .home-page .ar-hero-copy { translate: none; transform: none; width: 100%; padding: 0; margin-inline: 0; }
+  .home-page .home-hero-copy { padding-inline: 0; width: 100%; }
+  .home-page .wid-group { inset-inline: auto; left: 0; right: 0; }
+  .home-page .home-hero-copy h1 { font-size: clamp(36px, 10.3vw, 48px); }
+  .home-page .home-hero-copy [data-motion='hero-subtitle'] { letter-spacing: .12em; }
+  .home-page .home-hero-copy > div:has(> [data-motion='hero-cta']) { flex-wrap: wrap; }
+  .home-page [data-motion='cta-button'] { max-width: 100%; white-space: normal; }
+  .home-page .ar-belief h2, .home-page [data-motion='belief-band'] h2 { max-width: 100%; font-size: clamp(32px, 9vw, 40px); overflow-wrap: anywhere; }
+
+  /* Work: one column retains the exact data order and five items per page. */
+  .work-page { min-height: 100svh; padding: 10px var(--mobile-gutter) 40px; }
+  .work-page > .relative > div:first-child { margin-inline: 0; }
+  .work-page [data-motion='plate'] { height: auto; margin-top: 36px; padding-bottom: 28px; }
+  .work-page .work-eyebrow { font-size: 12px; letter-spacing: .16em; }
+  .work-page .work-title { font-size: clamp(44px, 13vw, 64px); line-height: 1.15; }
+  .work-page [data-motion='lede'] {
+    position: static; width: auto; margin-top: 22px; font-size: 17px; line-height: 1.65;
+  }
+  .work-page [data-motion='lede'] br { display: none; }
+  .work-page [data-motion='work-scene'] { display: none; }
+  .work-page [data-motion='field'] > div:first-child { height: auto; flex-direction: column; gap: 14px; }
+  .work-page [data-motion='field'] > div:first-child > div { flex-wrap: wrap; gap: 8px; }
+  .work-page [data-motion='filter'] { height: auto; min-height: 44px; padding: 10px 14px; font-size: 12px; }
+  .work-page [data-motion='sort'] { padding-top: 0; }
+  .work-page [data-motion='grid'] { height: auto; grid-template-columns: minmax(0, 1fr); grid-template-rows: none; gap: 20px; }
+  .work-page [data-motion='card'] { height: auto; grid-row: auto; }
+  .work-page [data-motion='card'] > div:first-of-type { height: auto; }
+  .work-page [data-motion='card-media'] { height: auto; }
+  .work-page [data-motion='card-media'] :is(img, video) {
+    display: block; width: 100%; height: auto; max-height: 65svh;
+    object-fit: contain; object-position: center; aspect-ratio: auto;
+    transform: none !important;
+  }
+  .work-page [data-motion='card'] > div:first-of-type > span {
+    position: static; display: table; margin: 12px; max-width: calc(100% - 24px); white-space: normal;
+  }
+  .work-page [data-motion='card'] > div:last-child { padding: 16px; }
+  .work-page [data-motion='card'] h2 { font-size: 23px; line-height: 1.3; padding-inline-end: 38px; }
+  .work-page [data-motion='card'] p:last-of-type {
+    font-size: 14px; line-height: 1.65; margin-top: 10px; padding-inline: 0 42px; white-space: normal;
+  }
+  .work-page [data-motion='footer'] { height: auto; flex-wrap: wrap; justify-content: space-between; gap: 20px; margin-top: 28px; }
+  .work-page [data-motion='footer'] > :is(div, p) { position: static; }
+  .work-page [data-motion='footer'] > div:first-child > span:not(:first-child) { display: none; }
+  .work-page [data-motion='footer'] > p { width: 100%; font-size: 10px; letter-spacing: .18em; text-align: center; }
+
+  /* About and Contact: convert their fixed canvas to normal document flow. */
+  :is(.about-page, .contact-page) { min-height: 100svh; padding: 10px 0 40px; }
+  :is(.about-page, .contact-page) > .relative { width: 100%; padding-inline: var(--mobile-gutter); }
+  .about-page .about-hero { height: auto !important; padding-top: 36px; }
+  .about-page .about-hero > :is(p, h1, figure),
+  .contact-page .contact-statement, .contact-page .contact-statement > :is(p, h1),
+  .contact-page .contact-details, .contact-page .contact-panel {
+    position: relative; inset: auto; width: 100%; max-width: 100%; margin-inline: 0; transform: none;
+  }
+  :is(.about-page .about-hero, .contact-page .contact-statement) > p:first-child { font-size: 12px; letter-spacing: .18em; }
+  :is(.about-page .about-hero, .contact-page .contact-statement) > h1 {
+    margin-top: 18px; font-size: clamp(32px, 9vw, 42px); line-height: 1.25; letter-spacing: 0;
+  }
+  :is(.about-page .about-hero, .contact-page .contact-statement) [data-motion='title-line'] { white-space: normal; }
+  .about-page .about-lede, .contact-page .contact-statement > p:last-child {
+    margin-top: 24px; font-size: 18px; line-height: 1.7;
+  }
+  :is(.about-page .about-hero, .contact-page .contact-statement) > [data-motion='rule'] { display: none; }
+  .about-page [data-motion='about-scene'] { position: relative; height: 300px; margin-top: 24px; }
+  .about-page [data-motion='about-scene'] > :not([data-motion='tulip']) { display: none; }
+  .about-page [data-motion='tulip'] {
+    inset: 0; margin: auto; width: 220px; height: 290px; object-fit: contain; transform: none;
+  }
+  .about-page .about-quote { margin-block: 28px 36px; padding: 0 18px; }
+  .about-page .about-quote blockquote { margin-top: 16px; font-size: 18px; line-height: 1.7; }
+  .about-page .about-quote br { display: none; }
+  .about-page .about-quote figcaption { margin-top: 16px; font-size: 38px; }
+  .about-page .about-cards { padding: 0; flex-direction: column; gap: 24px; }
+  .about-page .about-cards article { width: 100% !important; height: auto; padding: 24px 20px; }
+  .about-page .about-cards article > :not(.card-bloom) {
+    position: relative; inset: auto; width: auto; max-width: 100%; margin: 0; transform: none;
+  }
+  .about-page .about-cards article > [data-motion='icon'] { width: 56px; height: 56px; margin-bottom: 18px; }
+  .about-page .about-cards .card-label { font-size: 12px; }
+  .about-page .about-cards article > .card-title { font-size: 28px; line-height: 1.3; margin-top: 8px; }
+  .about-page .about-cards article > .card-body { margin-top: 18px; font-size: 16px; line-height: 1.7; }
+  .about-page .about-cards article > :is(.card-services, .card-stats, .card-tools, .card-languages) { margin-top: 24px; }
+  .about-page .card-services { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .about-page .card-services li { line-height: 1.5; }
+  .about-page .card-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .about-page .card-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .about-page .card-languages ul { flex-wrap: wrap; gap: 12px; line-height: 1.5; }
+  .about-page .about-cards article > :is(.card-tick, .card-split, [data-motion='mark'], [data-motion='numeral']),
+  .about-page [data-motion='rail'], .contact-page [data-motion='contact-scene'] { display: none; }
+  .contact-page .contact-statement { padding-top: 36px; }
+  .contact-page .contact-details { margin-top: 30px; }
+  .contact-page .contact-details > div { height: auto; padding-block: 22px; gap: 16px; }
+  .contact-page .contact-details > div > div { min-width: 0; }
+  .contact-page .contact-details a { max-width: 100%; font-size: 17px; line-height: 1.5; }
+  .contact-page .contact-details a[href^='mailto:'] { overflow-wrap: anywhere; }
+  .contact-page .contact-details a[href^='tel:'] { direction: ltr; unicode-bidi: isolate; justify-content: flex-start; }
+  .contact-page .contact-details a[href^='https://wa.me'] { width: 100%; height: auto; min-height: 48px; padding: 10px 14px; font-size: 14px; }
+  .contact-page .contact-details > div:last-child { flex-direction: column; gap: 24px; }
+  .contact-page .contact-details > div:last-child > div { width: 100%; gap: 16px; }
+  .contact-page .contact-details > div:last-child [data-motion='row-part'] { flex-wrap: wrap; }
+  .contact-page .contact-panel { margin-top: 28px; padding: 24px 18px; }
+  .contact-page .contact-panel h2 { font-size: 14px; letter-spacing: .12em; line-height: 1.5; }
+  .contact-page form .grid { grid-template-columns: minmax(0, 1fr); }
+  .contact-page :is(input, textarea) { width: 100%; min-width: 0; font-size: 16px; }
+
+  /* All case studies share these structural components. */
+  .case-study-page > .relative > div:first-child { padding-top: 10px; }
+  .case-study-page section.home-section { padding-inline: var(--mobile-gutter); margin-top: 56px; }
+  .case-study-page section.home-section:first-of-type { padding-top: 30px; margin-top: 0; }
+  .case-study-page .home-section :is(div, header, figure, p, dl) { max-width: 100%; min-width: 0; }
+  .case-study-page .home-section .grid { width: 100%; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .case-study-page .home-section .sticky { position: static; }
+  .case-study-page .home-section > .flex { flex-direction: column; align-items: stretch; gap: 24px; }
+  .case-study-page .home-section h1 { font-size: clamp(36px, 10vw, 48px); line-height: 1.2; letter-spacing: 0; }
+  .case-study-page .home-section h2 { font-size: clamp(28px, 8vw, 36px); line-height: 1.3; letter-spacing: 0; }
+  .case-study-page .home-section .font-serif { font-size: 17px; line-height: 1.75; }
+  .case-study-page .home-section p.font-nav { font-size: 12px; line-height: 1.7; letter-spacing: .1em; }
+  .case-study-page .home-section dl.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 16px; padding-bottom: 24px; }
+  .case-study-page .home-section dd { font-size: 14px; line-height: 1.6; }
+  .case-study-page .home-section figure { width: 100%; margin-inline: auto; }
+  .case-study-page section.home-section :is(img, video) { max-width: 100%; height: auto; object-fit: contain; object-position: center; }
+  .case-study-page .home-section video { max-height: 75svh; }
+  .case-study-page .home-section :is([class*='mt-[46px]'], [class*='mt-[52px]'], [class*='mt-[64px]'], [class*='mt-[74px]'], [class*='mt-[86px]']) { margin-top: 30px; }
+  .case-study-page section.home-section:last-of-type > div:has(> a) { flex-wrap: wrap; gap: 16px; }
+  .case-study-page section.home-section:last-of-type > div:has(> a) > p { width: 100%; }
+  .case-study-page section.home-section:last-of-type > div:has(> a) > a { justify-content: center; padding: 12px 18px; height: auto; min-height: 48px; font-size: 14px; }
+
+  /* Logical alignment wins over desktop Arabic offsets without reversing media. */
+  html[dir='rtl'] :is(.work-page, .about-page, .contact-page, .case-study-page) :is(h1, h2, p, dd, dt) { text-align: start; }
+  html[dir='rtl'] :is(.about-page .about-hero, .contact-page .contact-statement) [data-motion='title-line'] { line-height: 1.5; }
+  html[dir='rtl'] .work-page [data-motion='card'] > div:last-child > span { right: auto; left: 16px; }
+  html[dir='rtl'] .case-study-page .home-section :is(.font-nav, .font-serif) { letter-spacing: 0; }
+}

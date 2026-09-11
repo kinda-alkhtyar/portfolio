@@ -192,6 +192,17 @@ export function CaseStudyOutro({ meta }: { meta: CaseStudyMeta }) {
         <p className="font-nav text-[11px] tracking-[0.34em] text-white/30">
           {meta.title} — {meta.year}
         </p>
+        {meta.liveUrl && (
+          <a
+            href={meta.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex h-[50px] items-center gap-[18px] rounded-full border border-white/30 px-[28px] font-nav text-[15px] tracking-[0.1em] text-white transition-colors hover:border-purple-light hover:text-purple-light"
+          >
+            {t('LIVE PROJECT')}
+            <span aria-hidden="true" className="text-beige">↗</span>
+          </a>
+        )}
         <Link
           to={path('/work')}
           className="flex h-[50px] items-center gap-[18px] rounded-full border border-white/30 px-[28px] font-nav text-[15px] tracking-[0.1em] text-white transition-colors hover:border-purple-light hover:text-purple-light"

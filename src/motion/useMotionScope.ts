@@ -26,12 +26,23 @@ type MotionSetup = (helpers: {
 export function useMotionScope<T extends HTMLElement>(setup: MotionSetup) {
   const ref = useRef<T>(null)
   const [reduced, setReduced] = useState(prefersReducedMotion)
+  const [phone, setPhone] = useState(() => window.matchMedia('(max-width: 767.98px)').matches)
+
+  useLayoutEffect(() => {
+    const media = window.matchMedia('(max-width: 767.98px)')
+    const update = () => setPhone(media.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
 
   useLayoutEffect(() => onReducedMotionChange(setReduced), [])
 
   useLayoutEffect(() => {
     const scope = ref.current
     if (!scope || reduced) return
+    // These desktop scenes use fixed distances and pinned media. Phone pages
+    // read in normal flow; Home retains its existing mobile choreography.
+    if (phone && scope.matches('.work-page, .about-page, .contact-page, .case-study-page')) return
 
     let teardown: void | (() => void)
 
@@ -51,7 +62,7 @@ export function useMotionScope<T extends HTMLElement>(setup: MotionSetup) {
     }
     // `setup` describes the section's entrance, which runs once per mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced])
+  }, [reduced, phone])
 
   return ref
 }

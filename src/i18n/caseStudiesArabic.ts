@@ -137,7 +137,7 @@ export function localizeCaseStudy(caseStudy: CaseStudy): CaseStudy {
       intro: localizedMeta?.intro ?? caseStudy.meta.intro,
       facts: caseStudy.meta.facts.map((fact) => ({ ...fact, label: labels[fact.label] ?? fact.label, value: translateFact(fact.value) })),
     },
-    sections: caseStudy.sections.map(localizeSection),
+    ...(caseStudy.sections ? { sections: caseStudy.sections.map(localizeSection) } : {}),
   }
 }
 

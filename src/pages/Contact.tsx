@@ -22,8 +22,8 @@ import { useLocale } from '../i18n/localization'
 
 const EMAIL = 'almuallemyumna@gmail.com'
 /** Digits only, for the `tel:` and `wa.me` links. */
-const PHONE_E164 = '+905513403448'
-const PHONE_DISPLAY = '0551 340 34 48'
+const PHONE_E164 = '+905513403447'
+const PHONE_DISPLAY = '+90 551 340 34 47'
 /** Prefilled text for the WhatsApp chat link. */
 const WHATSAPP_MESSAGE = 'Hi Yumna, I came across your portfolio and I’d like to discuss a project with you.'
 const WHATSAPP_HREF = `https://wa.me/${PHONE_E164.replace('+', '')}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`

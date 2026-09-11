@@ -15,11 +15,14 @@ export default function ProjectGridCard({ project, featured = false }: { project
   const locale = useLocale()
   const path = useLocalizedPath()
   const t = useT()
+  const portraitVideo = featured && project.slug === 'effervescence'
+  const containedVideo = project.slug === 'veil-in-motion'
   return (
     /* `data-tier` is motion weight only: `workMotion` reads it to pick the
        card's reveal phrasing, its arrival depth and its tilt ceiling. Nothing
        visual on this card branches on it. */
     <article
+      dir={locale === 'ar' ? 'rtl' : 'ltr'}
       data-motion="card"
       data-featured={featured || undefined}
       data-tier={project.tier ?? 'support'}
@@ -33,7 +36,7 @@ export default function ProjectGridCard({ project, featured = false }: { project
       {project.slug && (
         <Link
           to={path(`/work/${project.slug}`)}
-          aria-label={`View the ${project.title} case study`}
+          aria-label={locale === 'ar' && (project.slug === 'taaniqi' || containedVideo) ? `عرض دراسة حالة ${t(project.title)}` : `View the ${project.title} case study`}
           className="absolute inset-0 z-10 rounded-[11px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-light"
         />
       )}
@@ -47,7 +50,7 @@ export default function ProjectGridCard({ project, featured = false }: { project
         <div data-motion="card-media" className="size-full">
           {project.media === 'video' ? (
             <video
-              data-motion="card-image"
+              data-motion={portraitVideo || containedVideo ? undefined : 'card-image'}
               src={project.cover}
               muted
               autoPlay
@@ -55,8 +58,8 @@ export default function ProjectGridCard({ project, featured = false }: { project
               playsInline
               preload="metadata"
               aria-hidden="true"
-              className="size-full object-cover will-change-transform"
-              style={{ objectPosition: project.position }}
+              className={portraitVideo ? 'mx-auto h-full aspect-[9/16] max-w-full object-contain object-center' : containedVideo ? 'size-full object-contain object-center' : 'size-full object-cover will-change-transform'}
+              style={portraitVideo ? undefined : { objectPosition: project.position }}
             />
           ) : (
             <img
@@ -69,14 +72,14 @@ export default function ProjectGridCard({ project, featured = false }: { project
           )}
         </div>
         <span className="absolute left-[15px] top-[15px] rounded-full border border-beige/60 bg-bg/45 px-[13px] py-[5px] font-nav text-[10px] tracking-[0.08em] text-beige backdrop-blur-sm">
-          {t(project.category)}
+          {t(project.categoryLabel ?? project.category)}
         </span>
       </div>
 
       <div className={`relative flex min-h-0 flex-1 flex-col px-[16px] pb-[12px] ${featured ? 'pt-[13px]' : 'pt-[10px]'}`}>
         <p className="font-nav text-[10px] tracking-[0.13em] text-purple-light">{project.year}</p>
         <h2 className={`font-display leading-none tracking-[0.01em] text-white ${featured ? 'mt-[7px] text-[19px]' : 'mt-[4px] text-[17px]'}`}>
-          {project.title}
+          {t(project.title)}
         </h2>
         <p className={`whitespace-pre-line pr-[46px] text-[11px] leading-[1.45] text-muted ${featured ? 'mt-[8px]' : 'mt-[5px]'}`}>
           {projectDescription(project.title, project.description, locale)}

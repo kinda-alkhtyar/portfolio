@@ -75,6 +75,7 @@ export interface CaseStudyFact {
 }
 
 export interface CaseStudyMeta {
+  liveUrl?: string
   /** Must match the slug in `projects.ts` / `projectCovers.ts`. */
   slug: string
   title: string

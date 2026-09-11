@@ -18,7 +18,7 @@ const PETAL = '52% 52% 44% 44% / 40% 40% 62% 62%'
 
 /** The one LET'S TALK destination, shared by the desktop bar and the sheet. */
 const TALK_HREF =
-  'https://wa.me/905513403448?text=Hi%20Yumna%2C%20I%20came%20across%20your%20portfolio%20and%20I%E2%80%99d%20like%20to%20discuss%20a%20project%20with%20you.'
+  'https://wa.me/905513403447?text=Hi%20Yumna%2C%20I%20came%20across%20your%20portfolio%20and%20I%E2%80%99d%20like%20to%20discuss%20a%20project%20with%20you.'
 
 const linkClass =
   'relative block font-nav text-[22px] font-semibold leading-none tracking-[0.06em] transition-colors duration-300'
@@ -61,6 +61,14 @@ export default function Navbar({
      hidden and the compact bar at the bottom of this file takes its place, so
      no phone-width rule can ever reach the 1440-canvas composition. */
   const [menuOpen, setMenuOpen] = useState(false)
+  const [phone, setPhone] = useState(() => window.matchMedia('(max-width: 767.98px)').matches)
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767.98px)')
+    const update = () => setPhone(media.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
 
   // A route change closes the sheet; so does Escape.
   useEffect(() => setMenuOpen(false), [pathname])
@@ -204,7 +212,7 @@ export default function Navbar({
   const mobileBar = (
     <header
       data-cursor-exclude
-      className="fixed inset-x-0 top-0 lg:hidden"
+      className={`fixed inset-x-0 top-0 ${mobile ? 'lg:hidden' : 'min-[768px]:hidden'}`}
       style={{ zIndex: Z.nav }}
       data-mobile-nav={menuOpen ? 'open' : 'closed'}
     >
@@ -287,6 +295,7 @@ export default function Navbar({
           assistive tech, and collapses to zero height when closed. */}
       <div
         id="mobile-menu"
+        inert={!menuOpen}
         className={`relative overflow-hidden border-b border-[rgba(212,175,55,0.22)] bg-[rgba(18,10,28,0.97)] backdrop-blur-[14px] transition-[max-height,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           menuOpen ? 'max-h-[420px] opacity-100' : 'pointer-events-none max-h-0 opacity-0'
         }`}
@@ -339,14 +348,14 @@ export default function Navbar({
           of the flow costs no layout shift on the pages that stack under it. */}
       <div aria-hidden="true" className="h-[50px]" />
 
-      {mobile && mobileBar}
+      {(mobile || phone) && mobileBar}
 
       {/* `pt` reproduces the 28px the page's own top padding used to give the
           bar, so at rest it lands on the same pixel as the flow version. Sits
           on the `nav` rung: above every page layer, below the route wipe. */}
       <div
         data-cursor-exclude
-        className={`fixed inset-x-0 top-0 ${mobile ? 'max-lg:hidden' : ''}`}
+        className={`fixed inset-x-0 top-0 ${mobile ? 'max-lg:hidden' : 'max-[767.98px]:hidden'}`}
         style={{ zIndex: Z.nav, paddingTop: top }}
       >
         <div

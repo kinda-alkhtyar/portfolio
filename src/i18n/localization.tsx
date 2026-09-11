@@ -5,6 +5,11 @@ import { useLocation } from 'react-router-dom'
 export type Locale = 'en' | 'ar'
 
 const arabic: Record<string, string> = {
+  'VEIL IN MOTION': 'حكاية شال',
+  'AI Fashion Commercial': 'إعلان أزياء بالذكاء الاصطناعي',
+  'TAANIQI WITH IMAN': 'تأنقي مع إيمان',
+  'Fashion E-commerce / Web Design & Development': 'متجر أزياء / تصميم وتطوير ويب',
+  'LIVE PROJECT': 'عرض المشروع المباشر',
   HOME: 'الرئيسية', WORK: 'الأعمال', ABOUT: 'عنّي', CONTACT: 'تواصل', "LET'S TALK": 'لنتحدث',
   'LET’S TALK': 'لنتحدث', 'ABOUT ME': 'عنّي', 'VIEW PROJECTS': 'عرض المشاريع',
   'SELECTED WORK': 'أعمال مختارة', 'SELECTED PROJECTS': 'مشاريع مختارة', 'MY WORK': 'أعمالي',
@@ -82,6 +87,8 @@ export function useLocalizedPath() {
 }
 
 const projectDescriptions: Record<string, string> = {
+  'VEIL IN MOTION': 'إعلان أزياء تم إنشاؤه بالكامل بالذكاء الاصطناعي لعلامة شالات، يجمع بين الصورة السينمائية، الحركة، الصوت، والسرد في تجربة إعلانية متكاملة.',
+  'TAANIQI WITH IMAN': 'متجر أزياء عربي فاخر بهوية راقية\nوتشكيلات مختارة بعناية.',
   EFFERVESCENCE: 'دراسة سينمائية لحركة مشروب تستكشف\nالفقاعات والطاقة والملمس.', FLEURÉ: 'هوية فاخرة لمتجر زهور عبر\nالتغليف ونقاط التواصل.',
   'STILL HUMAN': 'ملصق مفاهيمي عن التواصل\nالإنساني والتعاطف.', 'STRAWBERRY & MILK': 'موقع منتج بصور جريئة\nوتفاعل مرح.',
   'DR. MOUHAMMAD ABOU SHAHIN': 'موقع راقٍ لعيادة أسنان يركّز\nعلى الثقة والوضوح وسهولة الوصول.',

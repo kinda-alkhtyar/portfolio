@@ -85,7 +85,7 @@ export default function Work() {
 
   function swap(direction: 1 | -1, apply: () => void) {
     const items = cards()
-    if (prefersReducedMotion() || !items.length) {
+    if (prefersReducedMotion() || window.matchMedia('(max-width: 767.98px)').matches || !items.length) {
       apply()
       return
     }
@@ -175,7 +175,7 @@ export default function Work() {
             </p>
           </div>
 
-          <div ref={gridRef} data-motion="grid" className="mt-[30px] grid h-[512px] grid-cols-[1.44fr_1fr_1fr] grid-rows-2 gap-[12px]">
+          <div ref={gridRef} dir={activeFilter === 'ALL PROJECTS' && currentPage === 0 ? 'ltr' : undefined} data-motion="grid" className="mt-[30px] grid h-[512px] grid-cols-[1.44fr_1fr_1fr] grid-rows-2 gap-[12px]">
             {pageItems.map((project, index) => <ProjectGridCard key={project.title} project={project} featured={index === 0} />)}
           </div>
 

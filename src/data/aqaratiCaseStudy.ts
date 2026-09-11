@@ -61,6 +61,7 @@ const facts: CaseStudyFact[] = [
 export const aqaratiCaseStudy: AqaratiCaseStudy = {
   meta: {
     slug: 'aqarati',
+    liveUrl: 'https://aqarati-syria.netlify.app/',
     title: 'AQARATI SYRIA',
     subtitle: 'Property Platform',
     category: 'UI/UX Design',

@@ -28,6 +28,7 @@ const facts: CaseStudyFact[] = [
 export const strawberryMilkCaseStudy: StrawberryMilkCaseStudy = {
   meta: {
     slug: 'strawberry-milk',
+    liveUrl: 'https://fruitm.netlify.app/',
     title: 'STRAWBERRY & MILK',
     subtitle: 'Product Website',
     category: 'UI/UX Design',
